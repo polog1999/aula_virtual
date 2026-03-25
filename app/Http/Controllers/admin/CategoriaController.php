@@ -40,28 +40,28 @@ class CategoriaController extends Controller
         Categoria::create([
             'nombre' => $request->createNombre
         ]);
-        
+        return back()->with('success','La categoría se registró correctamente.');
     }
     public function update(Request $request, $id)
     {
         $request->validate([
-            'edit_tipo_categoria' => 'required|in:edad,discapacidad,todas_edades',
-            'editEdadMinima' => 'nullable|integer|min:1|max:99',
-            'editEdadMaxima' => 'nullable|integer|min:1|max:99',
+            'editNombre' => 'required|string',
+            // 'editEdadMinima' => 'nullable|integer|min:1|max:99',
+            // 'editEdadMaxima' => 'nullable|integer|min:1|max:99',
         ]);
-        $dataToUpdate = [
-            'tiene_discapacidad' => false,
-            'edad_min' => null,
-            'edad_max' => null,
-        ];
-        $tieneDiscapacidad = false;
-        if ($request->edit_tipo_categoria == 'edad') {
-            $dataToUpdate['edad_min'] = $request->editEdadMinima;
-            $dataToUpdate['edad_max'] = $request->editEdadMaxima;
-        } else if ($request->edit_tipo_categoria == 'discapacidad') {
-            $dataToUpdate['tiene_discapacidad'] = true;
-            $tieneDiscapacidad = true;
-        }
+        // $dataToUpdate = [
+        //     'tiene_discapacidad' => false,
+        //     'edad_min' => null,
+        //     'edad_max' => null,
+        // ];
+        // $tieneDiscapacidad = false;
+        // if ($request->edit_tipo_categoria == 'edad') {
+        //     $dataToUpdate['edad_min'] = $request->editEdadMinima;
+        //     $dataToUpdate['edad_max'] = $request->editEdadMaxima;
+        // } else if ($request->edit_tipo_categoria == 'discapacidad') {
+        //     $dataToUpdate['tiene_discapacidad'] = true;
+        //     $tieneDiscapacidad = true;
+        // }
 
 
 
@@ -69,18 +69,21 @@ class CategoriaController extends Controller
 
 
             $categoria = Categoria::find($id);
-            $hayCategoria = Categoria::where('edad_min', $request->editEdadMinima)
-                ->where('edad_max', $request->editEdadMaxima)
-                ->where('tiene_discapacidad', $tieneDiscapacidad)
-                ->exists();
-            if (!$hayCategoria) {
-                $categoria->update($dataToUpdate);
-                return redirect()
-                    ->back()
-                    ->with('success', 'Categoría actualizada correctamente.');
-            } else {
-                return back()->with(['error' => 'Ya existe esta categoría.']);
-            }
+            $categoria->update([
+                'nombre' => $request->editNombre
+            ]);
+            // $hayCategoria = Categoria::where('edad_min', $request->editEdadMinima)
+            //     ->where('edad_max', $request->editEdadMaxima)
+            //     ->where('tiene_discapacidad', $tieneDiscapacidad)
+            //     ->exists();
+            // if (!$hayCategoria) {
+            //     $categoria->update($dataToUpdate);
+            //     return redirect()
+            //         ->back()
+            //         ->with('success', 'Categoría actualizada correctamente.');
+            // } else {
+            //     return back()->with(['error' => 'Ya existe esta categoría.']);
+            // }
         } catch (QueryException $e) {
             if ($e->getCode() === '23505') {
                 return redirect()
@@ -91,6 +94,7 @@ class CategoriaController extends Controller
                 ->back()
                 ->with('error', 'Ocurrió un error al actualizar la categoría.');
         }
+         return back()->with('success','La categoría se acrualizó correctamente.');
     }
     public function destroy($id)
     {

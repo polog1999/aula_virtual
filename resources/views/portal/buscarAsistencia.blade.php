@@ -192,7 +192,7 @@
                         </div>
 
                         {{-- {{dd($talleres)}} --}}
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="sede">Sede</label>
                             <select id="sede" name="sede" required>
                                 <option value="">-- Selecciona una sede --</option>
@@ -202,9 +202,9 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
                         <div class="form-group">
-                            <label for="disciplina">Disciplina deportiva</label>
+                            <label for="disciplina">Curso</label>
                             <select id="disciplina" name="disciplina" required>
                                 <option value="">-- Selecciona un deporte --</option>
                             </select>
@@ -590,7 +590,7 @@
                     $('#docente').empty().append(
                         '<option value="">Cargando...</option>');
                     $.ajax({
-                        url: '/encargado-sede/docentes/' + periodoId + '/' + sedeId + '/' + disciplinaId,
+                        url: '/encargado-sede/docentes/' + periodoId + '/' + disciplinaId,
                         type: 'GET',
                         success: function(data) {
                             $('#fecha').empty().append(

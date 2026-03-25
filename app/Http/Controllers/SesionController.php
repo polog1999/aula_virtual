@@ -2,27 +2,58 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Models\Modulo;
 use App\Models\Sesion;
 use Illuminate\Http\Request;
 
 class SesionController extends Controller
 {
-    public function index(){
-
-    }
-    public function store(Request $request){
-        $disciplina = Sesion::create([
-            'modulo_id' => $request->input('modulo_id'),
-            'titulo' => $request->titulo,
-            'descripcion' => $request->descripcion,
-            // 'categoria_id' => $request->categoria_id,
-            // 'fecha' => $request->fecha,
-            // 'link_reunion' => $request->link_reunion,
-            'es_evaluacion' => $request->es_evaluacion,
-            // 'estado' => $request->activo
-        
-            // 'cod_serv' => $request->createCodServ
+    public function store(Request $request)
+    {
+        $request->validate([
+            'modulo_id' => 'required|exists:modulos,id',
+            'descripcion' => 'required|string',
+            'es_evaluacion' => 'required|boolean',
+            'activo' => 'required|boolean',
         ]);
-        return redirect()->back();
+
+        // Lógica para el título automático
+        $nextSessionNumber = Sesion::where('modulo_id', $request->modulo_id)->count() + 1;
+        $tituloSesion = "Sesión " . $nextSessionNumber;
+
+        $sesion = Sesion::create([
+            'modulo_id' => $request->modulo_id,
+            'titulo' => $tituloSesion, // Título automático
+            'descripcion' => $request->descripcion,
+            'es_evaluacion' => $request->es_evaluacion,
+            'activo' => $request->activo,
+            // 'fecha', 'link_reunion' no están en tu formulario, Laravel los pondrá como null si la BD lo permite
+        ]);
+
+        // Redirigir de vuelta al curso al que pertenece este módulo
+        $cursoId = Modulo::find($request->modulo_id)->curso_id;
+        return redirect()->route('portal.cursos.index', ['curso_id' => $cursoId])
+                         ->with('success', 'Sesión creada correctamente.');
+    }
+
+    public function update(Request $request, Sesion $sesion)
+    {
+        $request->validate([
+            'descripcion' => 'required|string',
+            'es_evaluacion' => 'required|boolean',
+            'activo' => 'required|boolean',
+        ]);
+
+        $sesion->update([
+            // 'titulo' => $request->titulo, // El título no se edita si es automático
+            'descripcion' => $request->descripcion,
+            'es_evaluacion' => $request->es_evaluacion,
+            'activo' => $request->activo,
+        ]);
+        
+        $cursoId = $sesion->modulo->curso_id;
+        return redirect()->route('portal.cursos.index', ['curso_id' => $cursoId])
+                         ->with('success', 'Sesión actualizada correctamente.');
     }
 }

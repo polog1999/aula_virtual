@@ -30,32 +30,26 @@
                 <div style="width: 100%;overflow: auto;">
                     <table>
                         <thead>
-                            <tr>
+                            <tr><th>DNI</th>
                                 <th>Alumno</th>
-                                <th>Apoderado</th>
-                                <th>Taller</th>
+                                <th>Curso</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($users as $user)
                                 <tr>
-
+                                    <td>{{$user->numero_documento}}</td>
                                     <td>{{ $user->nombres . ' ' . $user->apellido_paterno . ' ' . $user->apellido_materno }}
                                     </td>
                                     {{-- <td>{{ $user->docente->especialidad }} --}}
-                                    <td>
-                                        @if ($user->alumno)
-                                            {{ $user->alumno->padre?->user?->nombres ? $user->alumno->padre?->user->nombres . ' ' . $user->alumno->padre->user->apellido_paterno : '--Sin Apoderado--' }}
-                                        @endif
-
-                                    </td>
+                                 
                                     {{-- <td> --}}
                                     <td>
                                         @if ($user->alumno?->matricula != null)
                                             @foreach ($user->alumno?->matricula as $m)
-                                                {{ $m->seccion->talleres->disciplina->nombre }}
-                                                ({{ $m->seccion->nombre }}){{ $loop->last ? '' : ' | ' }}
+                                                {{ $m->seccion->curso->nombre }}
+                                                ({{ $m->seccion->curso->categoria->nombre }}){{ $loop->last ? '' : ' | ' }}
                                             @endforeach
                                         @endif
                                     </td>

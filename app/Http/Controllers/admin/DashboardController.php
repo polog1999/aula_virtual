@@ -7,6 +7,7 @@ use App\Models\Matricula;
 use App\Models\Taller;
 use App\Models\Categoria;
 use App\Models\CronogramaPago;
+use App\Models\Curso;
 use App\Models\Disciplina;
 use App\Models\Docente;
 use App\Models\Lugar;
@@ -64,7 +65,7 @@ class DashboardController extends Controller
         $num_alumnos = Matricula::where('estado', 'ACTIVA')->distinct('alumno_id')->count('alumno_id');
 
         $categorias = Categoria::select('id')->get();
-        $disciplinas = Disciplina::select('id', 'nombre')->get();
+        $disciplinas = Curso::select('id', 'nombre')->get();
         $lugares = Lugar::select('id', 'nombre')->get();
         $docentes = Docente::select('user_id')->with(['user:id,nombres,apellido_paterno,apellido_materno'])->get();
 

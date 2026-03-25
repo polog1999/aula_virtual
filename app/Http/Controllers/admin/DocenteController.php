@@ -10,12 +10,12 @@ class DocenteController extends Controller
     public function index(Request $request){
         $query = User::query();
 
-        $query->where('es_docente',true)->with(['docente','docente.secciones','docente.secciones.talleres.disciplina', 'docente.secciones.talleres.categoria'])->orderBy('updated_at','desc')->get();
+        $query->where('es_docente',true)->with(['docente','docente.secciones','docente.secciones.curso', 'docente.secciones.curso.categoria'])->orderBy('updated_at','desc')->get();
         // dd($users->toArray());
         if($request->filled('search')){
             $search = $request->search;
             $query->where('nombres', 'ilike',"%{$search}%")
-            ->orWhereHas('docente.secciones.talleres.disciplina', function ($q) use($search){
+            ->orWhereHas('docente.secciones.curso', function ($q) use($search){
                 $q->where('nombre','ilike', "%{$search}%");
             })
             ->orWhereHas('docente.secciones', function ($q) use($search){

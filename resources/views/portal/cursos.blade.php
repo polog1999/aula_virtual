@@ -142,10 +142,20 @@
             <div class="table-container">
                 @if ($cursoSeleccionado)
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3>Módulos de: {{ $cursoSeleccionado->nombre }}</h3>
-                        <button class="btn btn-primary" id="openCreateModuleModalBtn">
-                            <i class="fa-solid fa-plus"></i> Añadir Módulo
-                        </button>
+                        <h3>Unidades de: {{ $cursoSeleccionado->nombre }}</h3>
+                        <div>
+                            <button class="btn btn-secondary" id="editCourseBtn"
+                                data-id="{{ $cursoSeleccionado->id }}"
+                                data-nombre="{{ $cursoSeleccionado->nombre }}"
+                                data-descripcion="{{ $cursoSeleccionado->descripcion }}"
+                                data-categoria_id="{{ $cursoSeleccionado->categoria_id }}"
+                                data-activo="{{ $cursoSeleccionado->activo }}">
+                                <i class="fa-solid fa-pencil"></i> Editar Curso
+                            </button>
+                            <button class="btn btn-primary" id="openCreateModuleModalBtn">
+                                <i class="fa-solid fa-plus"></i> Añadir Unidad
+                            </button>
+                        </div>
                     </div>
 
                     <div class="module-accordion">
@@ -155,10 +165,16 @@
                                     <h4><i class="fa-solid fa-layer-group"></i> {{ $modulo->nombre }}</h4>
                                     <div>
                                         <button class="btn btn-secondary btn-sm edit-module-btn"
-                                            data-modulo-id="{{ $modulo->id }}" data-nombre="{{ $modulo->nombre }}"
-                                            data-descripcion="{{ $modulo->descripcion }}">Editar</button>
+                                            data-modulo-id="{{ $modulo->id }}"
+                                            data-nombre="{{ $modulo->nombre }}"
+                                            data-descripcion="{{ $modulo->descripcion }}"
+                                            data-orden="{{ $modulo->orden }}"
+                                            data-prerequisito_id="{{ $modulo->prerequisito_id }}"
+                                            data-disponible_desde="{{ $modulo->disponible_desde ? \Carbon\Carbon::parse($modulo->disponible_desde)->format('Y-m-d') : '' }}"
+                                            data-activo="{{ $modulo->activo }}">Editar</button>
                                         <button class="btn btn-primary btn-sm add-session-btn"
-                                            data-modulo-id="{{ $modulo->id }}">Añadir Sesión</button>
+                                            data-modulo-id="{{ $modulo->id }}"
+                                            data-modulo-nombre="{{$modulo->nombre}}">Añadir Sesión</button>
                                     </div>
                                 </div>
                                 <div class="module-body">
@@ -168,12 +184,17 @@
                                                 <div>
                                                     <i
                                                         class="{{ $sesion->es_evaluacion ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-book-open' }}"></i>
-                                                    <strong>{{ $sesion->descripcion }}</strong>
-                                                    {{-- ({{ \Carbon\Carbon::parse($sesion->fecha)->format('d/m/Y') }}) --}}
+                                                    <strong>{{ $sesion->titulo }}</strong> - <span>{{ $sesion->descripcion }}</span>
                                                 </div>
                                                 <div>
-                                                    {{-- <button class="btn btn-secondary btn-sm">Recursos</button> --}}
-                                                    <button class="btn btn-primary btn-sm">Editar</button>
+                                                    <button class="btn btn-secondary btn-sm">Recursos</button>
+                                                    <button class="btn btn-primary btn-sm edit-session-btn"
+                                                        data-sesion-id="{{ $sesion->id }}"
+                                                        data-modulo-id="{{ $sesion->modulo_id }}"
+                                                        data-titulo="{{ $sesion->titulo }}"
+                                                        data-descripcion="{{ $sesion->descripcion }}"
+                                                        data-es_evaluacion="{{ $sesion->es_evaluacion }}"
+                                                        data-activo="{{ $sesion->activo }}">Editar</button>
                                                 </div>
                                             </div>
                                         @empty
@@ -183,13 +204,12 @@
                                 </div>
                             </div>
                         @empty
-                            <p>Este curso aún no tiene módulos. ¡Añade el primero!</p>
+                            <p>Este curso aún no tiene unidades. ¡Añade la primera!</p>
                         @endforelse
                     </div>
                 @else
                     <h3>Selecciona un Curso</h3>
-                    <p>Por favor, selecciona un curso de la lista de la izquierda para ver y gestionar sus módulos y
-                        sesiones.</p>
+                    <p>Por favor, selecciona un curso de la lista de la izquierda para ver y gestionar sus unidades y sesiones.</p>
                 @endif
             </div>
         </div>
@@ -204,43 +224,26 @@
                 <h2 id="courseModalTitle">Crear Nuevo Curso</h2>
                 <span class="close-icon">&times;</span>
             </div>
-            <form id="courseForm" method="POST" enctype="multipart/form-data">
+            <form id="courseForm" method="POST" action="{{ route('portal.cursos.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div id="courseMethod"></div>
                 <div class="form-grid">
-                    <div class="form-group full-width"><label for="courseNombre">Nombre del Curso</label><input
-                            type="text" id="courseNombre" name="nombre" required></div>
-                    <div class="form-group full-width"><label for="courseDescripcion">Descripción</label>
-                        <textarea id="courseDescripcion" name="descripcion" rows="4"
-                            style="width: 100%; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 1rem;"></textarea>
-                    </div>
-                    <div class="form-group"><label for="courseCategoria">Categoría</label><select id="courseCategoria"
-                            name="categoria_id" required>
-                            <option value="">Seleccionar...</option>
-                            @foreach ($categorias as $cat)
-                                <option value="{{ $cat->id }}">{{ $cat->nombre }}</option>
-                            @endforeach
-                        </select></div>
-                    <div class="form-group"><label for="courseImagen">Imagen</label><input type="file" id="courseImagen"
-                            name="imagen" accept="image/*"></div>
-                    <div class="form-group"><label for="courseActivo">Estado</label><select id="courseActivo" name="activo"
-                            required>
-                            <option value="1">Activo</option>
-                            <option value="0">Inactivo</option>
-                        </select></div>
+                    <div class="form-group full-width"><label for="courseNombre">Nombre del Curso</label><input type="text" id="courseNombre" name="nombre" required></div>
+                    <div class="form-group full-width"><label for="courseDescripcion">Descripción</label><textarea id="courseDescripcion" name="descripcion" rows="4" style="width: 100%; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 1rem;"></textarea></div>
+                    <div class="form-group"><label for="courseCategoria">Categoría</label><select id="courseCategoria" name="categoria_id" required><option value="">Seleccionar...</option>@foreach($categorias as $cat)<option value="{{ $cat->id }}">{{ $cat->nombre }}</option>@endforeach</select></div>
+                    <div class="form-group"><label for="courseImagen">Imagen</label><input type="file" id="courseImagen" name="imagen" accept="image/*"></div>
+                    <div class="form-group"><label for="courseActivo">Estado</label><select id="courseActivo" name="activo" required><option value="1">Activo</option><option value="0">Inactivo</option></select></div>
                 </div>
-                <div class="modal-footer"><button type="button"
-                        class="btn btn-secondary cancel-btn">Cancelar</button><button type="submit"
-                        class="btn btn-primary">Guardar Curso</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary cancel-btn">Cancelar</button><button type="submit" class="btn btn-primary">Guardar Curso</button></div>
             </form>
         </div>
     </div>
-
+    
     <!-- Modal para CREAR/EDITAR Módulo -->
     <div id="moduleModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="moduleModalTitle">Añadir Módulo</h2>
+                <h2 id="moduleModalTitle">Añadir Unidad</h2>
                 <span class="close-icon">&times;</span>
             </div>
             <form id="moduleForm" method="POST">
@@ -248,37 +251,23 @@
                 <div id="moduleMethod"></div>
                 <input type="hidden" name="curso_id" value="{{ $cursoSeleccionado?->id }}">
                 <div class="form-grid">
-                    <div class="form-group full-width"><label for="moduleNombre">Nombre del Módulo</label><input
-                            type="text" id="moduleNombre" name="nombre" required></div>
-                    <div class="form-group full-width"><label for="moduleDescripcion">Descripción</label>
-                        <textarea id="moduleDescripcion" name="descripcion" rows="3"
-                            style="width: 100%; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 1rem;"></textarea>
-                    </div>
-                    <div class="form-group full-width"><label for="moduleOrden">Orden</label><input type="number"
-                            id="moduleOrden" name="orden" required></div>
-                    <div class="form-group full-width"><label for="selectModule">Modulo Requisito</label>
-                        <select id="selectModule" name="selectModule">
-                            <option value="">Seleccionar Módulo</option>
-                            @forelse ($modulos as $modulo)
-                                <option value="{{ $modulo->id }}">{{$modulo->nombre}}</option>
-                            @empty
-                            No hay modulos
-                            @endforelse
-                        </select>
-
-                    </div>
-                    <div class="form-group full-width"><label for="disponible_desde">Disponible Desde</label><input
-                            type="date" id="disponible_desde" name="disponible_desde" required></div>
-                    <div class="form-group full-width"><label for="selectEstado">Estado</label>
-                        <select id="selectEstado" name="activo">
-                            <option value="1">ACTIVO</option>
-                            <option value="1">INACTIVO</option>
+                    <input type="hidden" id="moduleNombre" name="nombre">
+                    <div class="form-group full-width"><label for="moduleDescripcion">Descripción de la Unidad</label><textarea id="moduleDescripcion" name="descripcion" rows="3" required style="width: 100%; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 1rem;"></textarea></div>
+                    <div class="form-group"><label for="moduleOrden">Orden</label><input type="number" id="moduleOrden" name="orden" required></div>
+                    <div class="form-group"><label for="selectModule">Unidad Requisito (Opcional)</label>
+                        <select id="selectModule" name="prerequisito_id">
+                            <option value="">Ninguno</option>
+                            @if($cursoSeleccionado)
+                                @foreach ($cursoSeleccionado->modulos as $modulo)
+                                    <option value="{{ $modulo->id }}">{{$modulo->nombre}}</option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
+                    <div class="form-group"><label for="disponible_desde">Disponible Desde</label><input type="date" id="disponible_desde" name="disponible_desde" required></div>
+                    <div class="form-group"><label for="selectEstadoModulo">Estado</label><select id="selectEstadoModulo" name="activo"><option value="1">Activo</option><option value="0">Inactivo</option></select></div>
                 </div>
-                <div class="modal-footer"><button type="button"
-                        class="btn btn-secondary cancel-btn">Cancelar</button><button type="submit"
-                        class="btn btn-primary">Guardar Módulo</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary cancel-btn">Cancelar</button><button type="submit" class="btn btn-primary">Guardar Unidad</button></div>
             </form>
         </div>
     </div>
@@ -295,30 +284,17 @@
                 <div id="sessionMethod"></div>
                 <input type="hidden" id="sessionModuleId" name="modulo_id">
                 <div class="form-grid">
-                     <div class="form-group full-width"><label for="sessionTitulo">Título</label><input
-                            type="text" id="sessionTitulo" name="titulo" required></div>
-                    <div class="form-group full-width"><label for="sessionDescripcion">Descripción</label><input
-                            type="text" id="sessionDescripcion" name="descripcion" required></div>
-                    {{-- <div class="form-group"><label for="sessionFecha">Fecha</label><input type="date"
-                            id="sessionFecha" name="fecha" required></div> --}}
-                    {{-- <div class="form-group"><label for="sessionLink">Link Reunión (Zoom, Meet)</label><input
-                            type="url" id="sessionLink" name="link_reunion"></div> --}}
+                    <input type="hidden" id="sessionTitulo" name="titulo">
+                    <div class="form-group full-width"><label for="sessionDescripcion">Descripción de la Sesión</label><input type="text" id="sessionDescripcion" name="descripcion" required></div>
                     <div class="form-group"><label>¿Es una evaluación?</label>
                         <div style="display:flex; gap: 1rem; align-items:center; margin-top: 0.5rem;">
                             <label><input type="radio" name="es_evaluacion" value="1"> Sí</label>
                             <label><input type="radio" name="es_evaluacion" value="0" checked> No</label>
                         </div>
                     </div>
+                    <div class="form-group"><label for="selectEstadoSesion">Estado</label><select id="selectEstadoSesion" name="activo"><option value="1">Activo</option><option value="0">Inactivo</option></select></div>
                 </div>
-                <div class="form-group full-width"><label for="selectEstado">Estado</label>
-                    <select id="selectEstado" name="activo">
-                        <option value="1">ACTIVO</option>
-                        <option value="1">INACTIVO</option>
-                    </select>
-                </div>
-                <div class="modal-footer"><button type="button"
-                        class="btn btn-secondary cancel-btn">Cancelar</button><button type="submit"
-                        class="btn btn-primary">Guardar Sesión</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary cancel-btn">Cancelar</button><button type="submit" class="btn btn-primary">Guardar Sesión</button></div>
             </form>
         </div>
     </div>
@@ -327,22 +303,16 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            function openModal(modal) {
-                if (modal) modal.style.display = 'flex';
-            }
-
-            function closeModal(modal) {
-                if (modal) modal.style.display = 'none';
-            }
+            function openModal(modal) { if (modal) modal.style.display = 'flex'; }
+            function closeModal(modal) { if (modal) modal.style.display = 'none'; }
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.querySelector('.close-icon')?.addEventListener('click', () => closeModal(modal));
                 modal.querySelector('.cancel-btn')?.addEventListener('click', () => closeModal(modal));
             });
 
-            // Lógica del Acordeón
             document.querySelectorAll('.module-header').forEach(header => {
-                header.addEventListener('click', () => {
-                    header.parentElement.classList.toggle('open');
+                header.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) { header.parentElement.classList.toggle('open'); }
                 });
             });
 
@@ -352,33 +322,47 @@
             document.getElementById('openCreateCourseModalBtn')?.addEventListener('click', () => {
                 courseForm.reset();
                 document.getElementById('courseModalTitle').textContent = 'Crear Nuevo Curso';
-                courseForm.action = "{{ route('portal.cursos.store') }}"; // Asume esta ruta
+                courseForm.action = "{{ route('portal.cursos.store') }}";
                 document.getElementById('courseMethod').innerHTML = '';
                 openModal(courseModal);
             });
-            // (Necesitarías una lógica similar para editar cursos)
+            document.getElementById('editCourseBtn')?.addEventListener('click', function() {
+                courseForm.reset();
+                document.getElementById('courseModalTitle').textContent = `Editar Curso: ${this.dataset.nombre}`;
+                document.getElementById('courseNombre').value = this.dataset.nombre;
+                document.getElementById('courseDescripcion').value = this.dataset.descripcion;
+                document.getElementById('courseCategoria').value = this.dataset.categoria_id;
+                document.getElementById('courseActivo').value = this.dataset.activo;
+                courseForm.action = `{{ url('portal/cursos') }}/${this.dataset.id}`;
+                document.getElementById('courseMethod').innerHTML = '@method("PUT")';
+                openModal(courseModal);
+            });
 
             // --- Lógica para Módulos ---
             const moduleModal = document.getElementById('moduleModal');
             const moduleForm = document.getElementById('moduleForm');
             document.getElementById('openCreateModuleModalBtn')?.addEventListener('click', () => {
                 moduleForm.reset();
-                document.getElementById('moduleModalTitle').textContent = 'Añadir Nuevo Módulo';
-                moduleForm.action = "{{ route('portal.modulos.store') }}"; // Asume esta ruta
+                document.getElementById('moduleModalTitle').textContent = 'Añadir Nueva Unidad';
+                const nextModuleNumber = {{ $cursoSeleccionado ? $cursoSeleccionado->modulos->count() + 1 : 1 }};
+                document.getElementById('moduleNombre').value = `Módulo ${nextModuleNumber}`;
+                moduleForm.action = "{{ route('portal.modulos.store') }}";
                 document.getElementById('moduleMethod').innerHTML = '';
                 openModal(moduleModal);
             });
             document.querySelectorAll('.edit-module-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Evita que el acordeón se cierre
+                    e.stopPropagation();
                     moduleForm.reset();
-                    document.getElementById('moduleModalTitle').textContent =
-                        `Editar Módulo: ${this.dataset.nombre}`;
+                    document.getElementById('moduleModalTitle').textContent = `Editar Unidad: ${this.dataset.nombre}`;
                     document.getElementById('moduleNombre').value = this.dataset.nombre;
                     document.getElementById('moduleDescripcion').value = this.dataset.descripcion;
-                    moduleForm.action =
-                        `{{ url('admin/modulos') }}/${this.dataset.moduloId}`; // Asume esta ruta
-                    document.getElementById('moduleMethod').innerHTML = '@method('PUT')';
+                    document.getElementById('moduleOrden').value = this.dataset.orden;
+                    document.getElementById('selectModule').value = this.dataset.prerequisito_id;
+                    document.getElementById('disponible_desde').value = this.dataset.disponible_desde;
+                    document.getElementById('selectEstadoModulo').value = this.dataset.activo;
+                    moduleForm.action = `{{ url('portal/modulos') }}/${this.dataset.moduloId}`;
+                    document.getElementById('moduleMethod').innerHTML = '@method("PUT")';
                     openModal(moduleModal);
                 });
             });
@@ -390,15 +374,32 @@
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     sessionForm.reset();
-                    document.getElementById('sessionModalTitle').textContent =
-                        'Añadir Nueva Sesión';
+                    const moduloNombre = this.dataset.moduloNombre;
+                    const sessionsInModule = this.closest('.module').querySelectorAll('.session-item').length;
+                    const nextSessionNumber = sessionsInModule + 1;
+                    document.getElementById('sessionModalTitle').textContent = `Añadir Sesión a ${moduloNombre}`;
+                    document.getElementById('sessionTitulo').value = `Sesión ${nextSessionNumber}`;
                     document.getElementById('sessionModuleId').value = this.dataset.moduloId;
-                    sessionForm.action = "{{ route('portal.sesiones.store') }}"; // Asume esta ruta
+                    sessionForm.action = "{{ route('portal.sesiones.store') }}";
                     document.getElementById('sessionMethod').innerHTML = '';
                     openModal(sessionModal);
                 });
             });
-            // (Necesitarías lógica para editar sesiones)
+            document.querySelectorAll('.edit-session-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sessionForm.reset();
+                    document.getElementById('sessionModalTitle').textContent = `Editar Sesión: ${this.dataset.titulo}`;
+                    document.getElementById('sessionTitulo').value = this.dataset.titulo;
+                    document.getElementById('sessionDescripcion').value = this.dataset.descripcion;
+                    document.getElementById('sessionModuleId').value = this.dataset.moduloId;
+                    document.querySelector(`input[name="es_evaluacion"][value="${this.dataset.es_evaluacion}"]`).checked = true;
+                    document.getElementById('selectEstadoSesion').value = this.dataset.activo;
+                    sessionForm.action = `{{ url('portal/sesiones') }}/${this.dataset.sesionId}`;
+                    document.getElementById('sessionMethod').innerHTML = '@method("PUT")';
+                    openModal(sessionModal);
+                });
+            });
         });
     </script>
 @endpush

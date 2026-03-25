@@ -10,10 +10,10 @@
     <style>
         /* --- TUS ESTILOS CSS COMPLETOS (SIN CAMBIOS) --- */
         :root {
-            --primary-color: #1E8449;
-            --secondary-color: #2ECC71;
-            --dark-gray: #34495E;
-            --light-gray: #F4F6F6;
+            --primary-color: #004a99;
+            --secondary-color: #007bff;
+            --dark-gray: #003366;
+            --light-gray: #e7f1ff;
             --white: #ffffff;
             --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
@@ -680,8 +680,8 @@
                                     <span
                                         class="vacancies {{ $seccion->matriculas_activas_count >= $seccion->vacantes ? 'full' : '' }}">Inscritos:
                                         {{ $seccion->matriculas_activas_count ?? 0 }}/{{ $seccion->vacantes ?? 0 }}</span>
-                                    <button class="register-btn"
-                                        {{ $seccion->matriculas_activas_count >= $seccion->vacantes ? 'disabled' : '' }}>Inscribirme</button>
+                                    <a class="register-btn"   href="{{route('form.inscripciones',$seccion->id)}}"
+                                        {{ $seccion->matriculas_activas_count >= $seccion->vacantes ? 'disabled' : '' }}>Inscribirme</a>
                                 </div>
 
                             </div>
@@ -697,210 +697,6 @@
             <p>&copy; {{ date('Y') }} </p>
         </div>
     </footer>
-    <div id="registrationModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h2 id="modalTitle">Formulario de Inscripción</h2>
-
-            <div class="summary-info">
-                <p>Taller: <strong><span id="selectedWorkshopName"></span></strong></p>
-                <p>Horario: <strong><span id="selectedHorarioName"></span></strong></p>
-                <p>Duración: <strong><span id="selectedFrecuenciaName"></span></strong></p>
-                {{-- <p>Docente: <strong><span id="selectedWorkshopName"></span></strong></p> --}}
-                {{-- <p>Costo Mensual: <strong> <span id="mensualidadCost">0.00</span></strong></p> --}}
-            </div>
-
-            @if ($errors->any())
-                <div
-                    style="background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <strong>¡Ups! Revisa los siguientes errores:</strong>
-                    <ul style="list-style-type: none;">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form id="registrationForm" action="{{ route('talleres.preinscripcion') }}" method="POST">
-                @csrf
-                <input type="hidden" name="idTaller" id="idTaller">
-                <input type="hidden" name="costoMensualidad" id="costoMensualidad">
-                {{-- <input type="hidden" name="costoMatricula" id="costoMatricula"> --}}
-                <input type="hidden" name="idCategoria" id="idCategoria">
-                <input type="hidden" name="esAdulto" id="esAdulto">
-
-                <h4 id="inscription-type-title">¿A quién vas a inscribir?</h4>
-                <div class="inscription-type-selector" id="inscription-type-selector">
-                    <div id="minor-option-wrapper" style="display: flex; flex: 1;">
-                        <input type="radio" id="typeMinor" name="inscriptionType" value="minor">
-                        <label for="typeMinor" style="width: 100%;"><i class="fa-solid fa-child"></i> A un menor de
-                            edad</label>
-                    </div>
-                    <div id="adult-option-wrapper" style="display: flex; flex: 1;">
-                        <input type="radio" id="typeAdult" name="inscriptionType" value="adult">
-                        <label for="typeAdult" style="width: 100%;"><i class="fa-solid fa-user"></i> A mí mismo
-                            (adulto)</label>
-                    </div>
-                </div>
-
-                <div id="conadis-group" class="form-group full-width"
-                    style="display: none; background-color: #fffbe6; padding: 1rem; border-radius: 8px; border: 1px solid #ffe58f; margin-top: 8px;">
-                    <label for="conadisNumber" style="font-weight: bold; color: #856404;"><i
-                            class="fa-solid fa-universal-access"></i> Taller para Personas con Discapacidad</label>
-                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Por favor, ingrese el número de carnet del
-                        CONADIS del participante.</p>
-                    <input type="text" id="conadisNumber" name="conadis_number"
-                        placeholder="Número de Carnet CONADIS">
-                </div>
-
-
-                <div id="parent-data-container">
-                    <h4 id="parent-title">Datos del Apoderado</h4>
-                    <div class="form-grid">
-                        <div class="form-group"><label for="parentDNI">DNI</label><input type="text"
-                                id="parentDNI" name="parentDNI" required pattern="[0-9]{8}" maxlength="8"><small
-                                id="parent-helper-text"
-                                style="color: var(--primary-color); height: 1em; display: block;"></small></div>
-                        <div class="form-group"><label for="parentNames">Nombres</label><input type="text"
-                                id="parentNames" name="parentNames" required></div>
-                        <div class="form-group"><label for="parentPaternalLastName">Apellido Paterno</label><input
-                                type="text" id="parentPaternalLastName" name="parentPaternalLastName" required>
-                        </div>
-                        <div class="form-group"><label for="parentMaternalLastName">Apellido Materno</label><input
-                                type="text" id="parentMaternalLastName" name="parentMaternalLastName"></div>
-                        <div class="form-group"><label for="parentPhone">Celular</label><input type="tel"
-                                id="parentPhone" name="parentPhone" required pattern="[0-9]{9}" maxlength="9">
-                        </div>
-                        <!-- <div class="form-group"><label for="parentEmail">Email (para tu cuenta)</label><input
-                                type="email" id="parentEmail" name="parentEmail"
-                                required></div> -->
-                        {{-- INICIO: CAMPO DE EMAIL CON VERIFICACIÓN PARA APODERADO --}}
-                        <div class="form-group">
-                            <label for="parentEmail">Email (para tu cuenta)</label>
-                            <div class="email-verification-group">
-                                <input type="email" id="parentEmail" name="parentEmail" required>
-                                <button type="button" class="send-code-btn" data-target="parent">Enviar
-                                    Código</button>
-                            </div>
-                        </div>
-                        <div class="form-group verification-code-group" id="parent-code-group">
-                            <label for="parentVerificationCode">Código de Verificación</label>
-                            <input type="text" id="parentVerificationCode" name="parent_verification_code"
-                                placeholder="Ingresa el código de 6 dígitos" maxlength="6">
-                        </div>
-                        {{-- FIN: CAMPO DE EMAIL CON VERIFICACIÓN --}}
-                        <div class="form-group full-width"><label for="parentDireccion">Dirección</label><input
-                                type="text" id="parentDireccion" name="parentDireccion"></div>
-
-                        {{-- =============================================== --}}
-                        {{-- INICIO: CAMPO DE DISTRITO PARA APODERADO --}}
-                        {{-- =============================================== --}}
-                        <div class="form-group full-width">
-                            <label for="parentDistrito">Distrito</label>
-                            <select id="parentDistrito" name="parentDistrito">
-                                <option value="">Seleccione un distrito...</option>
-                                {{-- @foreach ($distritos as $distrito)
-                                    <option value="{{ $distrito->districodi }}">
-                                        {{ $distrito->distridesc }}</option>
-                                @endforeach --}}
-                                {{-- <option value="999">OTRO DISTRITO FUERA DE LIMA</option> --}}
-                            </select>
-                            <input type="text" id="parentDistritoNombre" class="form-control" disabled
-                                style="display: none;">
-
-                            <input type="hidden" id="parentDistritoId" name="parentDistritoHidden">
-                        </div>
-                        {{-- =============================================== --}}
-                        {{-- FIN: CAMPO DE DISTRITO --}}
-                        {{-- =============================================== --}}
-                    </div>
-                </div>
-                <div id="student-data-container">
-                    <h4 id="student-title">Datos del Alumno</h4>
-                    <div class="form-grid">
-                        <div class="form-group"><label for="studentDNI">DNI</label><input type="text"
-                                id="studentDNI" name="studentDNI" required pattern="[0-9]{8}" maxlength="8"><small
-                                id="student-helper-text"
-                                style="color: var(--primary-color); height: 1em; display: block;"></small></div>
-                        <div class="form-group"><label for="studentNames">Nombres</label><input type="text"
-                                id="studentNames" name="studentNames" required>
-                        </div>
-                        <div class="form-group"><label for="studentPaternalLastName">Apellido Paterno</label><input
-                                type="text" id="studentPaternalLastName" name="studentPaternalLastName" required>
-                        </div>
-                        <div class="form-group"><label for="studentMaternalLastName">Apellido Materno</label><input
-                                type="text" id="studentMaternalLastName" name="studentMaternalLastName" required>
-                        </div>
-                        <div class="form-group full-width"><label for="studentBirthdate">Fecha de
-                                Nacimiento</label><input type="date" id="studentBirthdate" name="studentBirthdate"
-                                required></div>
-
-                        <div class="form-group full-width" id="student-extra-fields" style="display: none;">
-                            <label for="studentPhone" style="margin-top:1rem;">Celular</label><input type="tel"
-                                id="studentPhone" name="studentPhone" pattern="[0-9]{9}" maxlength="9">
-                            <!-- <label for="studentEmail" style="margin-top:1rem;">Email (para tu cuenta)</label><input
-                                type="email" id="studentEmail" name="studentEmail"
-                                > -->
-                            {{-- INICIO: CAMPO DE EMAIL CON VERIFICACIÓN PARA ALUMNO ADULTO --}}
-                            <div class="form-group" style="margin-top: 1rem;">
-                                <label for="studentEmail">Correo Electrónico (para tu cuenta)</label>
-                                <div class="email-verification-group">
-                                    <input type="email" id="studentEmail" name="studentEmail">
-                                    <button type="button" class="send-code-btn" data-target="student">Enviar
-                                        Código</button>
-                                </div>
-                            </div>
-                            <div class="form-group verification-code-group" id="student-code-group">
-                                <label for="studentVerificationCode">Código de Verificación</label>
-                                <input type="text" id="studentVerificationCode" name="student_verification_code"
-                                    placeholder="Ingresa el código de 6 dígitos" maxlength="6">
-                            </div>
-                            {{-- FIN: CAMPO DE EMAIL CON VERIFICACIÓN --}}
-                            <label for="studentDireccion" style="margin-top:1rem;">Dirección</label><input
-                                type="text" id="studentDireccion" name="studentDireccion">
-
-                            {{-- =============================================== --}}
-                            {{-- INICIO: CAMPO DE DISTRITO PARA ALUMNO ADULTO --}}
-                            {{-- =============================================== --}}
-                            <div class="form-group" style="margin-top:1rem;">
-                                <label for="studentDistrito">Distrito</label>
-                                <select id="studentDistrito" name="studentDistrito">
-                                    <option value="">Seleccione un distrito...</option>
-                                    {{-- @foreach ($distritos as $distrito)
-                                        <option value="{{ $distrito->districodi }}">
-                                            {{ $distrito->distridesc }}
-                                        </option>
-                                    @endforeach --}}
-                                    {{-- <option value="999">OTRO DISTRITO FUERA DE LIMA</option> --}}
-                                </select>
-                                <input type="text" id="studentDistritoNombre" class="form-control" disabled
-                                    style="display: none;">
-
-                                <input type="hidden" id="studentDistritoId" name="studentDistritoHidden">
-                            </div>
-                            {{-- =============================================== --}}
-                            {{-- FIN: CAMPO DE DISTRITO --}}
-                            {{-- =============================================== --}}
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="form-group checkbox" style="align-items: center;"><input type="checkbox" id="terms"
-                        name="terms" style="width: auto;" required><label for="terms" style="margin: 0;">He
-                        leído y acepto los <a href="#"
-                            style="
-                            color: #01AC68;
-                            text-decoration: underline;
-                            font-weight: bold;
-                            ">Términos
-                            y Condiciones</a></label></div>
-
-                <button type="submit" class="submit-btn" id="submit-inscripcion"><i class="fa-solid fa-arrow-right"></i> Continuar</button>
-            </form>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @if (session('error'))

@@ -51,20 +51,12 @@
                                                 {{-- {{ $s->talleres->disciplina->nombre }} ({{$s->talleres->categoria->nombre}}){{ $loop->last ? '' : ' | ' }} --}}
                                                 {{-- {{ $s->talleres->disciplina->nombre }}
                                                 ({{ $s->nombre }}) --}}
-                                                {{ $s->talleres->disciplina->nombre }} -
+                                                {{ $s->curso->nombre }} -
                                                 {{ $s->nombre }}
                                                 @php
-                                                    $categoria = $s->talleres->categoria;
+                                                    $categoria = $s->curso->categoria;
                                                 @endphp
-                                                @if ($categoria->edad_min != null && $categoria->edad_max == null)
-                                                    (De {{ $categoria->edad_min }} años a más)
-                                                @elseif($categoria->edad_min != null && $categoria->edad_max != null)
-                                                    (De {{ $categoria->edad_min }} a {{ $categoria->edad_max }} años de)
-                                                @elseif($categoria->tiene_discapacidad)
-                                                    (Para personas con discapacidad)
-                                                @else
-                                                    (Todas las edades)
-                                                @endif
+                                              
                                                 
                                             {{ $loop->last ? '' : ' | ' }}
                                         @endforeach

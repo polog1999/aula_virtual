@@ -12,10 +12,10 @@
     <style>
         /* --- TUS ESTILOS GENERALES (SIN CAMBIOS) --- */
         :root {
-            --primary-color: #1E8449;
-            --secondary-color: #2ECC71;
-            --dark-gray: #34495E;
-            --light-gray: #F4F6F6;
+            --primary-color: #004a99;
+            --secondary-color: #007bff;
+            --dark-gray: #003366;
+            --light-gray: #e7f1ff;
             --white: #ffffff;
             --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
@@ -72,7 +72,7 @@
         }
 
         .hero {
-            background: linear-gradient(rgba(30, 132, 73, 0.8), rgba(30, 132, 73, 0.8)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            background: linear-gradient(#004a9976, #007bff78), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
             color: var(--white);
             padding: 6rem 0;
             text-align: center;

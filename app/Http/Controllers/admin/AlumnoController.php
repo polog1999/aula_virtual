@@ -10,7 +10,7 @@ class AlumnoController extends Controller
 {
     public function index(Request $request){
         $query = User::query();
-        $query->has('alumno')->with(['alumno.padre','alumno.padre.user','alumno.matricula.seccion.talleres'])->orderBy('nombres','asc');
+        $query->has('alumno')->with(['alumno.matricula.seccion.curso','alumno.matricula.seccion.curso.categoria'])->orderBy('nombres','asc');
         // dd($users->toArray());
         if($request->filled('search')){
             $search = $request->search;

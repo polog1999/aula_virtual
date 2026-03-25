@@ -33,6 +33,7 @@ use App\Http\Controllers\AsistenciaController as AdminAsistenciaController;
 use App\Http\Controllers\docente\HijoController as DocenteHijoController;
 use App\Http\Controllers\docente\HorarioController as DocenteHorarioController;
 use App\Http\Controllers\docente\PagosController;
+use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\MisCursosController;
 use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\PerfilController;
@@ -51,14 +52,17 @@ Route::middleware('auth')->get('/seleccionar-rol/acceder', [SeleccionarRolContro
 Route::get('/pagos/comprobante/{pago}', [TallerController::class, 'generarComprobantePago'])->name('pagos.comprobante');
 // Route::post('/talleres', [TallerController::class, 'store'])->name('talleres.store');
 
+Route::get('form-inscripciones/{seccion_id}',[InscripcionController::class,'form'])->name('form.inscripciones');
+Route::post('form-inscripciones',[InscripcionController::class,'store'])->name('form.inscripciones.store');
+
 Route::middleware('auth', 'role:admin')->prefix('portal')->group(function () {
 
     // Route::get('/dashboard', [DashboardController::class, 'latestThree'])->name('portal.dashboard');
 
     Route::get('modulos', [ModuloController::class, 'index'])->name('portal.modulos.index');
     Route::post('modulos', [ModuloController::class, 'store'])->name('portal.modulos.store');
-    Route::put('modulos/{id}', [ModuloController::class, 'update'])->name('portal.modulos.update');
-    Route::delete('modulos/{id}', [ModuloController::class, 'destroy'])->name('portal.modulos.delete');
+    Route::put('modulos/{modulo}', [ModuloController::class, 'update'])->name('portal.modulos.update');
+    Route::delete('modulos/{modulo}', [ModuloController::class, 'destroy'])->name('portal.modulos.delete');
 
     Route::post('sesiones', [SesionController::class, 'store'])->name('portal.sesiones.store');
 
@@ -81,8 +85,8 @@ Route::middleware('auth', 'role:admin')->prefix('portal')->group(function () {
     Route::get('/cursos/create', [CursoController::class, 'create'])->name('portal.cursos.create');
 
     Route::post('/cursos', [CursoController::class, 'store'])->name('portal.cursos.store');
-    Route::put('/cursos/{id}', [CursoController::class, 'update'])->name('portal.cursos.update');
-    Route::delete('/cursos/{id}', [CursoController::class, 'destroy'])->name('portal.cursos.destroy');
+    Route::put('/cursos/{curso}', [CursoController::class, 'update'])->name('portal.cursos.update');
+    Route::delete('/cursos/{curso}', [CursoController::class, 'destroy'])->name('portal.cursos.destroy');
 
     Route::get('/periodos', [PeriodoController::class, 'index'])->name('portal.periodos.index');
     Route::post('/periodos', [PeriodoController::class, 'store'])->name('portal.periodos.store');
@@ -191,9 +195,9 @@ Route::middleware('auth', 'role:encargado_sede')->prefix('encargado-sede')->grou
     Route::get('/asistencias/reporte', [AsistenciaController::class, 'reporte'])->name('encargadoSede.asistencias.reporte');
     // Route::get('categorias/{disciplinaId}', [AsistenciaController::class, 'getCategorias']);
     // Route::get('docentes/{disciplinaId}/{categoriaId}', [AsistenciaController::class, 'getDocentes']);
-    Route::get('deportes/{periodoId}/{lugarId}', [AsistenciaController::class, 'getDisciplinas']);
-    Route::get('docentes/{periodoId}/{lugarId}/{disciplinaId}', [AsistenciaController::class, 'getDocentes']);
-    Route::get('secciones/{periodoId}/{lugarId}/{disciplinaId}/{docenteId}', [AsistenciaController::class, 'getSecciones']);
+    Route::get('deportes/{periodoId}/', [AsistenciaController::class, 'getDisciplinas']);
+    Route::get('docentes/{periodoId}/{disciplinaId}', [AsistenciaController::class, 'getDocentes']);
+    Route::get('secciones/{periodoId}/{disciplinaId}/{docenteId}', [AsistenciaController::class, 'getSecciones']);
     Route::get('sesiones/{seccionId}', [AsistenciaController::class, 'getSesiones']);
 
     Route::get('horarios/{periodoId}/{disciplinaId}/{seccionId}', [AsistenciaController::class, 'getHorarios']);

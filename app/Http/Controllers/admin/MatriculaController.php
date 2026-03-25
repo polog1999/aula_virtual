@@ -21,9 +21,9 @@ class MatriculaController extends Controller
         $query = Matricula::query();
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('seccion.talleres.disciplina', function ($q) use ($search) {
+            $query->whereHas('seccion.curso', function ($q) use ($search) {
                 $q->where('nombre', 'ilike', "%{$search}%");
-            })->orWhereHas('seccion.talleres.categoria', function ($q) use ($search) {
+            })->orWhereHas('seccion.curso.categoria', function ($q) use ($search) {
                 $q->where('nombre', 'ilike', "%{$search}%");
             })->orWhereHas('alumnos.user', function ($q) use ($search) {
                 $q->where('nombres', 'ilike', "%{$search}%")
@@ -39,11 +39,10 @@ class MatriculaController extends Controller
         //     ->select('matriculas.*') // <-- Esta línea es CLAVE
         //     ->orderBy('fecha_matricula', 'desc');
 
-        $query->with('cronogramasPagos.pago')
-            ->orderBy('fecha_matricula', 'desc');
+        $query->orderBy('fecha_matricula', 'desc');
         $matriculas = $query->paginate(10)->withQueryString();
         // dd($matriculas->toArray());
-        $secciones = Seccion::select('id', 'taller_id', 'docente_id', 'nombre')->with(['talleres', 'talleres.disciplina', 'docentes.user', 'talleres.categoria'])->get();
+        $secciones = Seccion::select('id', 'docente_id', 'nombre')->with(['curso', 'docentes.user', 'curso.categoria'])->get();
         return view('portal.matriculas', compact('matriculas', 'secciones'));
     }
     public function update($id, Request $request)

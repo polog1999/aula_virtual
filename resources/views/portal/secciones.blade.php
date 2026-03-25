@@ -120,7 +120,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group"><label for="createTaller">Taller</label>
+                    <div class="form-group"><label for="createTaller">Curso</label>
                         <select id="createTaller" name="createTaller" required>
                             <option value="">Seleccionar...</option>
                            @foreach($cursos as $curso)
@@ -201,7 +201,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group"><label for="editTaller">Taller</label>
+                    <div class="form-group"><label for="editTaller">Curso</label>
                         <select id="editTaller" name ="editTaller" required>
                             <option value="">Seleccionar...</option>
                             @foreach ($cursos as $curso)

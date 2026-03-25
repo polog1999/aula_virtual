@@ -39,9 +39,10 @@
                                     </td>
                                     <td>
                                         <button class="btn btn-primary edit-btn" data-id="{{ $categoria->id }}"
-                                            data-edad-min="{{ $categoria->edad_min }}"
+                                            data-nombre={{$categoria->nombre}}>
+                                            {{-- data-edad-min="{{ $categoria->edad_min }}"
                                             data-edad-max="{{ $categoria->edad_max }}"
-                                            data-discapacidad="{{ $categoria->tiene_discapacidad ? '1' : '0' }}">
+                                            data-discapacidad="{{ $categoria->tiene_discapacidad ? '1' : '0' }}"> --}}
                                             Editar
                                         </button>
                                         <form class="delete-form"
@@ -221,26 +222,28 @@
             document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const id = this.dataset.id;
-                    const edadMin = this.dataset.edadMin;
-                    const edadMax = this.dataset.edadMax;
-                    const esDiscapacidad = this.dataset.discapacidad === '1';
+                    const nombre = this.dataset.nombre;
+                    // const edadMin = this.dataset.edadMin;
+                    // const edadMax = this.dataset.edadMax;
+                    // const esDiscapacidad = this.dataset.discapacidad === '1';
 
                     editModalTitle.textContent = `Editar Categoría #${id}`;
 
-                    if (esDiscapacidad) {
-                        editForm.querySelector('input[value="discapacidad"]').checked = true;
-                        editEdadFields.style.display = 'none';
-                        editEdadFields.querySelectorAll('input').forEach(input => input.disabled =
-                            true);
-                    } else {
-                        editForm.querySelector('input[value="edad"]').checked = true;
-                        editEdadFields.style.display = 'grid';
-                        editEdadFields.querySelectorAll('input').forEach(input => input.disabled =
-                            false);
-                    }
+                    // if (esDiscapacidad) {
+                    //     editForm.querySelector('input[value="discapacidad"]').checked = true;
+                    //     editEdadFields.style.display = 'none';
+                    //     editEdadFields.querySelectorAll('input').forEach(input => input.disabled =
+                    //         true);
+                    // } else {
+                    //     editForm.querySelector('input[value="edad"]').checked = true;
+                    //     editEdadFields.style.display = 'grid';
+                    //     editEdadFields.querySelectorAll('input').forEach(input => input.disabled =
+                    //         false);
+                    // }
 
-                    document.getElementById('editEdadMinima').value = edadMin;
-                    document.getElementById('editEdadMaxima').value = edadMax;
+                    // document.getElementById('editEdadMinima').value = edadMin;
+                    // document.getElementById('editEdadMaxima').value = edadMax;
+                    document.getElementById('editNombre').value = nombre;
 
                     if (editForm) editForm.action = `{{ url('portal/categorias') }}/${id}`;
 

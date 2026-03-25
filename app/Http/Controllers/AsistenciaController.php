@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Asistencia;
 use App\Models\Categoria;
+use App\Models\Curso;
 use App\Models\Disciplina;
 use App\Models\Docente;
 use App\Models\Lugar;
@@ -27,7 +28,7 @@ class AsistenciaController extends Controller
         //  DB::enableQueryLog(); // 🟢 Empieza a registrar
 
         $periodos = Periodo::select('id', 'anio', 'ciclo')->get();
-        $sedes = Lugar::select('id', 'nombre')->get();
+        // $sedes = Lugar::select('id', 'nombre')->get();
         //?fecha=2025-08-06&disciplina=1&categoria=1&docente=106
         $fecha =  $request->fecha;
         $disciplinaId = $request->disciplina;
@@ -40,8 +41,8 @@ class AsistenciaController extends Controller
         $docenteId = $request->docente;
 
         $seccion = Seccion::find($seccionId);
-        $disciplina1 = Disciplina::find($disciplinaId);
-        $disciplinaSeleccionada = Disciplina::find($disciplinaId);
+        $disciplina1 = Curso::find($disciplinaId);
+        $disciplinaSeleccionada = Curso::find($disciplinaId);
         // dd($disciplina->toArray());
 
         $matriculas = null;
@@ -49,19 +50,17 @@ class AsistenciaController extends Controller
         $info = null;
         if ($request->filled('disciplina', 'periodo', 'sede', 'docente', 'fecha', 'seccion')) {
             $asistencias = Asistencia::join('matriculas', 'asistencias.matricula_id', '=', 'matriculas.id')
-                ->join('alumnos', 'matriculas.alumno_id', '=', 'alumnos.user_id')
+              ->join('alumnos', 'matriculas.alumno_id', '=', 'alumnos.user_id')
                 ->join('users', 'alumnos.user_id', '=', 'users.id')
                 ->join('secciones', 'matriculas.seccion_id', '=', 'secciones.id')
-                ->join('talleres', 'secciones.taller_id', '=', 'talleres.id')
-                ->join('disciplinas_deportivas', 'talleres.disciplina_id', '=', 'disciplinas_deportivas.id')
+                ->join('cursos', 'secciones.curso_id', '=', 'cursos.id')
                 ->join('periodos', 'secciones.periodo_id', '=', 'periodos.id')
-                ->whereDate('fecha', $fecha)
+              ->whereDate('fecha', $fecha)
                 ->when($periodoId, fn($q) => $q->where('periodos.id', $periodoId))
-                ->when($sedeId, fn($q) => $q->where('secciones.lugar_id', $sedeId))
-                ->when($disciplinaId, fn($q) => $q->where('talleres.disciplina_id', $disciplinaId))
+                ->when($disciplinaId, fn($q) => $q->where('cursos.id', $disciplinaId))
                 ->when($docenteId, fn($q) => $q->where('secciones.docente_id', $docenteId))
                 ->when($seccionId, fn($q) => $q->where('secciones.id', $seccionId))
-                ->orderBy('users.apellido_paterno', 'asc')
+                ->orderBy('users.nombre', 'asc')
                 ->select(
                     'asistencias.*',
                     'users.apellido_paterno as ape_paterno',
@@ -75,18 +74,18 @@ class AsistenciaController extends Controller
                 ->get();
                 
             if ($asistencias->isNotEmpty()) {
-                return view('portal.buscarAsistencia', compact('sedes', 'disciplina1', 'seccion', 'matriculas', 'periodos', 'asistencias', 'disciplinaSeleccionada', 'info'));
+                return view('portal.buscarAsistencia', compact('disciplina1', 'seccion', 'matriculas', 'periodos', 'asistencias', 'disciplinaSeleccionada', 'info'));
             } else {
                 //  if ($asistencias == null) {
                 // dd($asistencias->toArray());
                 $matriculas = Matricula::select('matriculas.*')
-                    ->with('seccion.talleres.disciplina', 'seccion.talleres.categoria', 'seccion.docentes', 'alumnos')
-                    ->whereHas('seccion.talleres', function ($q) use ($disciplinaId) {
-                        $q->where('disciplina_id', $disciplinaId);
+                    ->with('seccion.curso', 'seccion.curso.categoria', 'seccion.docentes', 'alumnos')
+                    ->whereHas('seccion.curso', function ($q) use ($disciplinaId) {
+                        $q->where('id', $disciplinaId);
                     })
-                    ->whereHas('seccion', function ($q) use ($periodoId, $seccionId, $docenteId, $sedeId) {
+                    ->whereHas('seccion', function ($q) use ($periodoId, $seccionId, $docenteId) {
                         $q->where('periodo_id', $periodoId)
-                            ->where('lugar_id', $sedeId)
+                            // ->where('lugar_id', $sedeId)
                             ->where('docente_id', $docenteId)
                             ->where('id', $seccionId);
                     })
@@ -105,7 +104,7 @@ class AsistenciaController extends Controller
                 }
 
                 // }
-                return view('portal.buscarAsistencia', compact('sedes', 'disciplina1', 'seccion', 'matriculas', 'periodos', 'asistencias', 'disciplinaSeleccionada', 'info'));
+                return view('portal.buscarAsistencia', compact('disciplina1', 'seccion', 'matriculas', 'periodos', 'asistencias', 'disciplinaSeleccionada', 'info'));
                 // $matriculas = Matricula::select('matriculas.*')
                 //     ->join('matriculas', 'matriculas.id', 'asistencias.matricula_id')
                 //     ->join('secciones', 'matriculas.seccion_id', '=', 'secciones.id')
@@ -136,7 +135,7 @@ class AsistenciaController extends Controller
         // dd($asistencias->toArray());
 
 
-        return view('portal.buscarAsistencia', compact('sedes', 'disciplina1', 'seccion', 'matriculas', 'periodos', 'asistencias', 'disciplinaSeleccionada', 'info'));
+        return view('portal.buscarAsistencia', compact('disciplina1', 'seccion', 'matriculas', 'periodos', 'asistencias', 'disciplinaSeleccionada', 'info'));
     }
 
     // public function create($periodoId, $disciplinaId, $seccionId, $fecha)
@@ -205,16 +204,15 @@ class AsistenciaController extends Controller
             ->with('success', 'Asistencia actualizada correctamente');
     }
 
-    public function getDisciplinas($periodoId, $lugarId)
+    public function getDisciplinas($periodoId)
     {
         //disciplinas = DB::table('secciones')
 
         $disciplinas = DB::table('secciones')
-            ->join('talleres', 'talleres.id', '=', 'secciones.taller_id')
-            ->join('disciplinas_deportivas', 'talleres.disciplina_id', '=', 'disciplinas_deportivas.id')
-            ->where('lugar_id', $lugarId)
+            ->join('cursos', 'cursos.id', '=', 'secciones.curso_id')
+            // ->where('lugar_id', $lugarId)
             ->where('periodo_id', $periodoId)
-            ->select('disciplinas_deportivas.id', 'disciplinas_deportivas.nombre')
+            ->select('cursos.id', 'cursos.nombre')
             ->distinct()
             ->get();
 
@@ -234,15 +232,14 @@ class AsistenciaController extends Controller
         //     ->values();
         return response()->json($disciplinas);
     }
-    public function getDocentes($periodoId, $lugarId, $disciplinaId)
+    public function getDocentes($periodoId, $disciplinaId)
     {
         $secciones = Seccion::where('periodo_id', $periodoId)
-            ->where('lugar_id', $lugarId)
-            ->whereHas('talleres', function ($q) use ($disciplinaId) {
-                $q->where('disciplina_id', $disciplinaId);
-            })
+            // ->where('lugar_id', $lugarId)
+          ->where('curso_id', $disciplinaId)
+           
             ->with('docentes.user:id,nombres,apellido_paterno,apellido_materno')
-            ->select('id', 'taller_id', 'docente_id')
+            ->select('id', 'curso_id', 'docente_id')
             ->get();
         // dd($secciones);
         $docentes = $secciones->map(function ($seccion) {
@@ -261,16 +258,14 @@ class AsistenciaController extends Controller
     }
 
 
-    public function getSecciones($periodoId, $lugarId, $disciplinaId, $docenteId)
+    public function getSecciones($periodoId, $disciplinaId, $docenteId)
     {
 
         $secciones = Seccion::where('periodo_id', $periodoId)
-            ->where('lugar_id', $lugarId)
+            // ->where('lugar_id', $lugarId)
             ->where('docente_id', $docenteId)
-            ->whereHas('talleres', function ($q) use ($disciplinaId) {
-                $q->where('disciplina_id', $disciplinaId);
-            })
-            ->select('id', 'taller_id', 'nombre')
+            ->where('curso_id', $disciplinaId)
+            ->select('id', 'curso_id', 'nombre')
             ->get();
         // dd($secciones);
         $secciones = $secciones->map(function ($seccion) {

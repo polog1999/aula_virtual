@@ -20,9 +20,9 @@
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom:1rem;">
                     <h3>Lista de matrículas</h3>
-                    <a href="{{ route('portal.reportes.alumnos') }}" class="btn btn-primary">
+                    {{-- <a href="{{ route('portal.reportes.alumnos') }}" class="btn btn-primary">
                         <i class="fa-solid fa-file-excel"></i> Exportar Alumnos a Excel
-                    </a>
+                    </a> --}}
                 </div>
                 <form method="GET" action="{{ route('portal.matriculas.index') }}" class="search-bar">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar matricula..."
@@ -34,8 +34,9 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>DNI</th>
                                 <th>Alumno</th>
-                                <th>Taller</th>
+                                <th>Curso</th>
                                 <th>Fecha de Matrícula</th>
                                 {{-- <th>Costo Matrícula</th> --}}
                                 <th>Estado</th>
@@ -47,9 +48,10 @@
                             @foreach ($matriculas as $i => $m)
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
+                                     <td>{{$m->alumnos?->user->numero_documento}}</td>
                                     <td>{{ $m->alumnos?->user->nombres }}
                                         {{ $m->alumnos?->user->apellido_paterno }}</td>
-                                    <td>{{ $m->seccion?->talleres->disciplina->nombre }}
+                                    <td>{{ $m->seccion?->curso->nombre }}
                                         ({{ $m->seccion?->nombre }})
                                         - {{ $m->seccion?->dia_semana }} -
                                         {{ $m->seccion?->docentes->user->nombres }}
@@ -69,10 +71,10 @@
                                         <span>(Matrícula manual)</span>
                                     @endif --}}
 
-                                        <button class="btn btn-primary edit-btn" data-bs-toggle="modal"
+                                        {{-- <button class="btn btn-primary edit-btn" data-bs-toggle="modal"
                                             data-bs-target="#editTallerModal" data-id="{{ $m->id }}"
                                             data-id-seccion="{{ $m->seccion?->id }}"
-                                            data-estado="{{ $m->estado }}">Editar</button>
+                                            data-estado="{{ $m->estado }}">Editar</button> --}}
                                         {{-- <form action="{{ route('portal.matriculas.cancelar', $m) }}" method="POST">
                                         @csrf
                                         @method('PUT')
@@ -118,7 +120,7 @@
                             required>
                             <option value="">Seleccionar...</option>
                             @foreach ($secciones as $s)
-                                <option value="{{ $s->id }}">{{ $s->talleres->disciplina->nombre }}
+                                <option value="{{ $s->id }}">{{ $s->curso?->nombre}}
                                     ({{ $s->nombre }})
                                     - {{ $s->dia_semana }} - {{ $s->docentes->user->nombres }}
                                     {{ $s->docentes->user->apellido_paterno }}</option>
