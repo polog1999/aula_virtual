@@ -25,7 +25,9 @@
         }
 
         .course-list-item a {
-            display: block;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 0.8rem 1rem;
             text-decoration: none;
             color: var(--dark-gray);
@@ -99,6 +101,11 @@
             padding: 0.3rem 0.8rem;
             font-size: 0.8rem;
         }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
 
         @media (max-width: 992px) {
             .constructor-container {
@@ -131,7 +138,12 @@
                         <li class="course-list-item">
                             <a href="{{ route('portal.cursos.index', ['curso_id' => $curso->id]) }}"
                                 class="{{ request('curso_id') == $curso->id ? 'active' : '' }}">
-                                {{ $curso->nombre }}
+                                <span>{{ $curso->nombre }}</span>
+                                <form action="{{ route('portal.cursos.destroy', $curso) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este curso? Esta acción no se puede deshacer.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm" style="padding: 2px 6px; font-size: 0.7rem;" onclick="event.stopPropagation();"><i class="fa-solid fa-trash"></i></button>
+                                </form>
                             </a>
                         </li>
                     @endforeach
@@ -165,16 +177,19 @@
                                     <h4><i class="fa-solid fa-layer-group"></i> {{ $modulo->nombre }}</h4>
                                     <div>
                                         <button class="btn btn-secondary btn-sm edit-module-btn"
-                                            data-modulo-id="{{ $modulo->id }}"
-                                            data-nombre="{{ $modulo->nombre }}"
-                                            data-descripcion="{{ $modulo->descripcion }}"
-                                            data-orden="{{ $modulo->orden }}"
+                                            data-modulo-id="{{ $modulo->id }}" data-nombre="{{ $modulo->nombre }}"
+                                            data-descripcion="{{ $modulo->descripcion }}" data-orden="{{ $modulo->orden }}"
                                             data-prerequisito_id="{{ $modulo->prerequisito_id }}"
                                             data-disponible_desde="{{ $modulo->disponible_desde ? \Carbon\Carbon::parse($modulo->disponible_desde)->format('Y-m-d') : '' }}"
                                             data-activo="{{ $modulo->activo }}">Editar</button>
                                         <button class="btn btn-primary btn-sm add-session-btn"
                                             data-modulo-id="{{ $modulo->id }}"
                                             data-modulo-nombre="{{$modulo->nombre}}">Añadir Sesión</button>
+                                        <form action="{{ route('portal.modulos.destroy', $modulo) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta unidad?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
                                     </div>
                                 </div>
                                 <div class="module-body">
@@ -182,19 +197,20 @@
                                         @forelse($modulo->sesiones as $sesion)
                                             <div class="session-item">
                                                 <div>
-                                                    <i
-                                                        class="{{ $sesion->es_evaluacion ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-book-open' }}"></i>
+                                                    <i class="{{ $sesion->es_evaluacion ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-book-open' }}"></i>
                                                     <strong>{{ $sesion->titulo }}</strong> - <span>{{ $sesion->descripcion }}</span>
                                                 </div>
                                                 <div>
                                                     <button class="btn btn-secondary btn-sm">Recursos</button>
                                                     <button class="btn btn-primary btn-sm edit-session-btn"
-                                                        data-sesion-id="{{ $sesion->id }}"
-                                                        data-modulo-id="{{ $sesion->modulo_id }}"
-                                                        data-titulo="{{ $sesion->titulo }}"
-                                                        data-descripcion="{{ $sesion->descripcion }}"
-                                                        data-es_evaluacion="{{ $sesion->es_evaluacion }}"
-                                                        data-activo="{{ $sesion->activo }}">Editar</button>
+                                                        data-sesion-id="{{ $sesion->id }}" data-modulo-id="{{ $sesion->modulo_id }}"
+                                                        data-titulo="{{ $sesion->titulo }}" data-descripcion="{{ $sesion->descripcion }}"
+                                                        data-es_evaluacion="{{ $sesion->es_evaluacion }}" data-activo="{{ $sesion->activo }}">Editar</button>
+                                                    <form action="{{ route('portal.sesiones.destroy', $sesion) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta sesión?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         @empty

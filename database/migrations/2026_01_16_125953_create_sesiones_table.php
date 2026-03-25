@@ -21,6 +21,7 @@ return new class extends Migration
             // $table->string('estado',20);
             // $table->string('link_reunion');
             $table->boolean('es_evaluacion');
+            $table->boolean('activo');
             $table->timestamps();
         });
     }

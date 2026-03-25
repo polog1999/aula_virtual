@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Categoria;
 use App\Models\Curso;
 use App\Models\Modulo;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -89,5 +90,23 @@ class CursoController extends Controller
         return redirect()->route('portal.cursos.index', ['curso_id' => $curso->id])->with('success', 'Curso actualizado correctamente.');
     }
 
-    // public function destroy(Curso $curso) ...
+    public function destroy(Curso $curso)
+    {
+        try {
+            // Intentamos eliminar el curso.
+            $curso->delete();
+            // Si tiene éxito, redirigimos a la página principal del constructor.
+            return redirect()->route('portal.cursos.index')->with('success', 'Curso eliminado correctamente.');
+
+        } catch (QueryException $e) {
+            // Si ocurre un error de base de datos...
+            // El código '23503' es de PostgreSQL para violación de FK.
+            // Para MySQL sería '23000'.
+            if ($e->getCode() === '23503') {
+                return redirect()->back()->with('error', 'No se puede eliminar este curso porque tiene módulos asociados.');
+            }
+            // Para cualquier otro error de BD.
+            return redirect()->back()->with('error', 'Ocurrió un error al eliminar el curso: ' . $e->getMessage());
+        }
+    }
 }

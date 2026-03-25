@@ -36,6 +36,7 @@ use App\Http\Controllers\docente\PagosController;
 use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\MisCursosController;
 use App\Http\Controllers\ModuloController;
+// use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SeleccionarRol;
 use App\Http\Controllers\SeleccionarRolController;
@@ -62,9 +63,10 @@ Route::middleware('auth', 'role:admin')->prefix('portal')->group(function () {
     Route::get('modulos', [ModuloController::class, 'index'])->name('portal.modulos.index');
     Route::post('modulos', [ModuloController::class, 'store'])->name('portal.modulos.store');
     Route::put('modulos/{modulo}', [ModuloController::class, 'update'])->name('portal.modulos.update');
-    Route::delete('modulos/{modulo}', [ModuloController::class, 'destroy'])->name('portal.modulos.delete');
+    Route::delete('modulos/{modulo}', [ModuloController::class, 'destroy'])->name('portal.modulos.destroy');
 
     Route::post('sesiones', [SesionController::class, 'store'])->name('portal.sesiones.store');
+    Route::delete('sesiones/{sesion}', [SesionController::class, 'destroy'])->name('portal.sesiones.destroy');
 
     Route::get('secciones', [SeccionController::class, 'index'])->name('portal.secciones.index');
     Route::post('secciones', [SeccionController::class, 'store'])->name('portal.secciones.store');

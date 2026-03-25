@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Modulo;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class ModuloController extends Controller
@@ -58,5 +59,22 @@ class ModuloController extends Controller
 
         return redirect()->route('portal.cursos.index', ['curso_id' => $modulo->curso_id])
                          ->with('success', 'Unidad actualizada correctamente.');
+    }
+    public function destroy(Modulo $modulo)
+    {
+        // Guardamos el ID del curso para la redirección
+        $cursoId = $modulo->curso_id;
+        
+        try {
+            $modulo->delete();
+            return redirect()->route('portal.cursos.index', ['curso_id' => $cursoId])
+                             ->with('success', 'Unidad eliminada correctamente.');
+
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23503') {
+                return redirect()->back()->with('error', 'No se puede eliminar esta unidad porque tiene sesiones asociadas.');
+            }
+            return redirect()->back()->with('error', 'Ocurrió un error al eliminar la unidad.');
+        }
     }
 }

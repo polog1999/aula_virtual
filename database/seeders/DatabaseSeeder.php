@@ -33,7 +33,8 @@ class DatabaseSeeder extends Seeder
             'activo' => 1
         ]);
         $this->call([
-            DisciplinaSeeder::class
+            DisciplinaSeeder::class,
+            RoleSeeder::class
         ]);
     }
 }
