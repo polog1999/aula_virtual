@@ -409,7 +409,7 @@
                     document.getElementById('sessionTitulo').value = this.dataset.titulo;
                     document.getElementById('sessionDescripcion').value = this.dataset.descripcion;
                     document.getElementById('sessionModuleId').value = this.dataset.moduloId;
-                    document.querySelector(`input[name="es_evaluacion"][value="${this.dataset.es_evaluacion}"]`).checked = true;
+                    document.querySelector('input[name="es_evaluacion"][value="${this.dataset.es_evaluacion}"]').checked = true;
                     document.getElementById('selectEstadoSesion').value = this.dataset.activo;
                     sessionForm.action = `{{ url('portal/sesiones') }}/${this.dataset.sesionId}`;
                     document.getElementById('sessionMethod').innerHTML = '@method("PUT")';

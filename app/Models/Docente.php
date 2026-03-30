@@ -16,6 +16,9 @@ class Docente extends Model
     public $timestamps = false;
 
     public $casts = ['es_docente' => 'boolean'];
+    public $fillable = [
+        'user_id'
+    ];
     
     public function user(){
         return $this->belongsTo(User::class, 'user_id');

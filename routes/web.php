@@ -41,6 +41,22 @@ use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SeleccionarRol;
 use App\Http\Controllers\SeleccionarRolController;
 use App\Http\Controllers\SesionController;
+use App\Livewire\AlumnoManager;
+use App\Livewire\Asistencia\AsistenciaManager;
+use App\Livewire\Asistencia\CentralReportes;
+use App\Livewire\Asistencia\ReporteMensual;
+use App\Livewire\CategoriaManager;
+use App\Livewire\CursoConstructor;
+use App\Livewire\Docente\MisCursos;
+use App\Livewire\DocenteManager;
+use App\Livewire\MatriculaManager;
+use App\Livewire\Perfil\MiPerfil;
+use App\Livewire\Periodos;
+use App\Livewire\Public\CatalogoCursos;
+use App\Livewire\Public\FormularioInscripcion;
+use App\Livewire\Public\SeccionesCurso;
+use App\Livewire\SeccionManager;
+use App\Livewire\UserManager;
 use App\Models\Sesion;
 use Illuminate\Support\Facades\Session;
 
@@ -53,8 +69,8 @@ Route::middleware('auth')->get('/seleccionar-rol/acceder', [SeleccionarRolContro
 Route::get('/pagos/comprobante/{pago}', [TallerController::class, 'generarComprobantePago'])->name('pagos.comprobante');
 // Route::post('/talleres', [TallerController::class, 'store'])->name('talleres.store');
 
-Route::get('form-inscripciones/{seccion_id}',[InscripcionController::class,'form'])->name('form.inscripciones');
-Route::post('form-inscripciones',[InscripcionController::class,'store'])->name('form.inscripciones.store');
+Route::get('form-inscripciones/{seccion_id}',FormularioInscripcion::class)->name('form.inscripciones');
+// Route::post('form-inscripciones',[InscripcionController::class,'store'])->name('form.inscripciones.store');
 
 Route::middleware('auth', 'role:admin')->prefix('portal')->group(function () {
 
@@ -68,57 +84,57 @@ Route::middleware('auth', 'role:admin')->prefix('portal')->group(function () {
     Route::post('sesiones', [SesionController::class, 'store'])->name('portal.sesiones.store');
     Route::delete('sesiones/{sesion}', [SesionController::class, 'destroy'])->name('portal.sesiones.destroy');
 
-    Route::get('secciones', [SeccionController::class, 'index'])->name('portal.secciones.index');
-    Route::post('secciones', [SeccionController::class, 'store'])->name('portal.secciones.store');
-    Route::put('secciones/{seccion}', [SeccionController::class, 'update'])->name('portal.secciones.update');
-    Route::delete('secciones/{seccion}', [SeccionController::class, 'destroy'])->name('portal.secciones.destroy');
+    Route::get('secciones', SeccionManager::class)->name('portal.secciones.index');
+    // Route::post('secciones', [SeccionController::class, 'store'])->name('portal.secciones.store');
+    // Route::put('secciones/{seccion}', [SeccionController::class, 'update'])->name('portal.secciones.update');
+    // Route::delete('secciones/{seccion}', [SeccionController::class, 'destroy'])->name('portal.secciones.destroy');
 
-    Route::get('/categorias', [CategoriaController::class, 'index'])->name('portal.categorias.index');
-    Route::post('/categorias', [CategoriaController::class, 'store'])->name('portal.categorias.store');
-    Route::put('/categorias/{id}', [CategoriaController::class, 'update'])->name('portal.categorias.update');
-    Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy'])->name('portal.categorias.destroy');
+    Route::get('/categorias', CategoriaManager::class)->name('portal.categorias.index');
+    // Route::post('/categorias', [CategoriaController::class, 'store'])->name('portal.categorias.store');
+    // Route::put('/categorias/{id}', [CategoriaController::class, 'update'])->name('portal.categorias.update');
+    // Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy'])->name('portal.categorias.destroy');
 
     Route::get('/lugares', [LugarController::class, 'index'])->name('portal.lugares.index');
     Route::post('/lugares', [LugarController::class, 'store'])->name('portal.lugares.store');
     Route::put('/lugares/{id}', [LugarController::class, 'update'])->name('portal.lugares.update');
     Route::delete('/lugares/{id}', [LugarController::class, 'destroy'])->name('portal.lugares.destroy');
 
-    Route::get('/cursos', [CursoController::class, 'index'])->name('portal.cursos.index');
-    Route::get('/cursos/create', [CursoController::class, 'create'])->name('portal.cursos.create');
+    Route::get('/cursos', CursoConstructor::class)->name('portal.cursos.index');
+    // Route::get('/cursos/create', [CursoController::class, 'create'])->name('portal.cursos.create');
 
-    Route::post('/cursos', [CursoController::class, 'store'])->name('portal.cursos.store');
-    Route::put('/cursos/{curso}', [CursoController::class, 'update'])->name('portal.cursos.update');
-    Route::delete('/cursos/{curso}', [CursoController::class, 'destroy'])->name('portal.cursos.destroy');
+    // Route::post('/cursos', [CursoController::class, 'store'])->name('portal.cursos.store');
+    // Route::put('/cursos/{curso}', [CursoController::class, 'update'])->name('portal.cursos.update');
+    // Route::delete('/cursos/{curso}', [CursoController::class, 'destroy'])->name('portal.cursos.destroy');
 
-    Route::get('/periodos', [PeriodoController::class, 'index'])->name('portal.periodos.index');
-    Route::post('/periodos', [PeriodoController::class, 'store'])->name('portal.periodos.store');
-    Route::put('/periodos/{id}', [PeriodoController::class, 'update'])->name('portal.periodos.update');
-    Route::delete('/periodos/{id}', [PeriodoController::class, 'destroy'])->name('portal.periodos.destroy');
-    Route::get('periodos/{periodoId}', [PeriodoController::class, 'getPeriodo']);
+    Route::get('/periodos', Periodos::class)->name('portal.periodos.index');
+    // Route::post('/periodos', [PeriodoController::class, 'store'])->name('portal.periodos.store');
+    // Route::put('/periodos/{id}', [PeriodoController::class, 'update'])->name('portal.periodos.update');
+    // Route::delete('/periodos/{id}', [PeriodoController::class, 'destroy'])->name('portal.periodos.destroy');
+    // Route::get('periodos/{periodoId}', [PeriodoController::class, 'getPeriodo']);
 
-    Route::get('matriculas', [MatriculaController::class, 'index'])->name('portal.matriculas.index');
-    Route::put('matriculas/{id}', [MatriculaController::class, 'update'])->name('portal.matriculas.update');
-    Route::delete('matriculas/{id}', [MatriculaController::class, 'destroy'])->name('portal.matriculas.destroy');
-    Route::put('matriculas/cancelar/{matricula}', [MatriculaController::class, 'cancelarMatricula'])->name('portal.matriculas.cancelar');
+    Route::get('matriculas', MatriculaManager::class)->name('portal.matriculas.index');
+    // Route::put('matriculas/{id}', [MatriculaController::class, 'update'])->name('portal.matriculas.update');
+    // Route::delete('matriculas/{id}', [MatriculaController::class, 'destroy'])->name('portal.matriculas.destroy');
+    // Route::put('matriculas/cancelar/{matricula}', [MatriculaController::class, 'cancelarMatricula'])->name('portal.matriculas.cancelar');
 
     // Route::get('/cronogramaPagos', [CronogramaPagoController::class, 'index'])->name('portal.cronogramaPagos.index');
     // Route::put('cronogramaPagos/{id}/confirmar', [CronogramaPagoController::class, 'confirmarPago']);
 
     Route::get('/pagos', [AdminPagoController::class, 'index'])->name('portal.pagos.index');
 
-    Route::get('docentes', [DocenteController::class, 'index'])->name('portal.docentes.index');
-    Route::put('docentes/{id}', [DocenteController::class, 'update'])->name('portal.docentes.update');
-    Route::delete('docentes/{id}', [DocenteController::class, 'destroy'])->name('portal.docentes.destroy');
+    Route::get('docentes',DocenteManager::class)->name('portal.docentes.index');
+    // Route::put('docentes/{id}', [DocenteController::class, 'update'])->name('portal.docentes.update');
+    // Route::delete('docentes/{id}', [DocenteController::class, 'destroy'])->name('portal.docentes.destroy');
 
-    Route::get('alumnos', [AlumnoController::class, 'index'])->name('portal.alumnos.index');
-    Route::put('alumnos/{id}', [AlumnoController::class, 'update'])->name('portal.alumnos.update');
-    Route::delete('alumnos/{id}', [AlumnoController::class, 'destroy'])->name('portal.alumnos.destroy');
+    Route::get('alumnos', AlumnoManager::class)->name('portal.alumnos.index');
+    // Route::put('alumnos/{id}', [AlumnoController::class, 'update'])->name('portal.alumnos.update');
+    // Route::delete('alumnos/{id}', [AlumnoController::class, 'destroy'])->name('portal.alumnos.destroy');
 
-    Route::get('usuarios', [UserController::class, 'index'])->name('portal.users.index');
-    Route::get('usuarios/{id}/edit', [UserController::class, 'edit'])->name('portal.users.edit');
-    Route::put('usuarios/{id}', [UserController::class, 'update'])->name('portal.users.update');
-    Route::post('usuarios', [UserController::class, 'store'])->name('portal.users.store');
-    Route::delete('usuarios/{id}', [UserController::class, 'destroy'])->name('portal.users.destroy');
+    Route::get('usuarios', UserManager::class)->name('portal.users.index');
+    // Route::get('usuarios/{id}/edit', [UserController::class, 'edit'])->name('portal.users.edit');
+    // Route::put('usuarios/{id}', [UserController::class, 'update'])->name('portal.users.update');
+    // Route::post('usuarios', [UserController::class, 'store'])->name('portal.users.store');
+    // Route::delete('usuarios/{id}', [UserController::class, 'destroy'])->name('portal.users.destroy');
 
     Route::get('reportes/alumnos-matriculados', [ReporteController::class, 'exportarAlumnos'])
         ->name('portal.reportes.alumnos');
@@ -127,10 +143,10 @@ Route::middleware('auth', 'role:admin')->prefix('portal')->group(function () {
         ->name('portal.reportes.pagos');
 });
 Route::middleware('auth', 'role:admin|encargado_sede')->prefix('portal')->group(function () {
-    Route::get('/asistencias', [AsistenciaController::class, 'index'])->name('portal.asistencias.index');
-    Route::put('/edit', [AsistenciaController::class, 'update'])->name('portal.asistencias.update');
-    Route::get('/asistencias/reporte-por-periodo', [AsistenciaController::class, 'reportePeriodo'])->name('portal.asistencias.reportePeriodo');
-    Route::get('/asistencias/reporte', [AsistenciaController::class, 'reporte'])->name('portal.asistencias.reporte');
+    Route::get('/asistencias', AsistenciaManager::class)->name('portal.asistencias.index');
+    // Route::put('/edit', [AsistenciaController::class, 'update'])->name('portal.asistencias.update');
+    Route::get('/asistencias/reporte-mensual', ReporteMensual::class)->name('portal.asistencias.reporteMensual');
+    Route::get('/asistencias/reporte',CentralReportes::class)->name('portal.asistencias.reporte');
     // Route::get('categorias/{disciplinaId}', [AsistenciaController::class, 'getCategorias']);
     // Route::get('docentes/{disciplinaId}/{categoriaId}', [AsistenciaController::class, 'getDocentes']);
     Route::get('deportes/{periodoId}/{lugarId}', [AsistenciaController::class, 'getDisciplinas']);
@@ -144,7 +160,7 @@ Route::middleware('auth', 'role:admin|encargado_sede')->prefix('portal')->group(
 
     Route::get('reportes/asistencias-periodo', [ReporteAsistenciaController::class, 'exportarAsistencias'])
         ->name('portal.reportes.asistencias');
-    Route::get('perfil', [PerfilController::class, 'index'])->name('portal.perfil.index');
+    Route::get('perfil', MiPerfil::class)->name('portal.perfil.index');
 
     Route::get(
         '/',
@@ -170,7 +186,7 @@ Route::middleware('auth', 'role:admin|encargado_sede')->prefix('portal')->group(
     // Route::get('perfil', [PerfilController::class, 'index'])->name('portal.perfil.index');
 });
 Route::middleware('auth', 'role:admin|docente|encargado_sede')->prefix('portal')->group(function () {
-    Route::get('/mis-cursos', [MisCursosController::class, 'index'])->name('portal.misCursos');
+    Route::get('/mis-cursos', MisCursos::class)->name('portal.misCursos');
 });
 
 Route::middleware('auth', 'role:docente')->prefix('docente')->group(function () {
@@ -227,8 +243,8 @@ Route::middleware('auth', 'role:PADRE')->prefix('apoderado')->group(function () 
     Route::get('/horarios', [ApoderadoHorarioController::class, 'index'])->name('apoderado.horarios.index');
 });
 
-Route::get('/', [ControllersDisciplinaController::class, 'index'])->name('index');
-Route::get('{disciplina}/talleres', [TallerController::class, 'show'])->name('talleres.show');
+Route::get('/', CatalogoCursos::class)->name('index');
+Route::get('{disciplina}/talleres', SeccionesCurso::class)->name('talleres.show');
 Route::post('/talleres/preInscripcion', [TallerController::class, 'storeInscripcion'])->name('talleres.preinscripcion');
 Route::get('/talleres/casi-listo/{token}', [TallerController::class, 'showCasiListo'])->name('talleres.casi-listo');
 Route::post('talleres/inscripcion/enviar-comprobante', [TallerController::class, 'storeComprobante'])->name('talleres.inscripcion.comprobante');
