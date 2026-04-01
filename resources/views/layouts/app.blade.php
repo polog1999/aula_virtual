@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,43 +11,73 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     @livewireStyles
 </head>
+
 <body>
     <div class="container-fluid">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h3>Portal 
-                    @activeRole('admin') Administrador @endactiveRole 
-                    @activeRole('encargado_sede') Encargado Sede @endactiveRole
+                <h3>Portal
+                    @activeRole('admin')
+                        Administrador
+                    @endactiveRole
+                    @activeRole('encargado_sede')
+                        Encargado Sede
+                    @endactiveRole
                 </h3>
             </div>
             <ul class="sidebar-nav">
                 @activeRole('admin')
-                    <li><a class="nav-link {{ Route::is('portal.periodos.index') ? 'active' : '' }}" href="{{ route('portal.periodos.index') }}">Gestión de Periodos</a></li>
-                    <li><a class="nav-link {{ Route::is('portal.cursos.index') ? 'active' : '' }}" href="{{ route('portal.cursos.index') }}">Gestión de Cursos</a></li>
-                    <li><a class="nav-link {{ Route::is('portal.categorias.index') ? 'active' : '' }}" href="{{ route('portal.categorias.index') }}">Gestión de Categorías</a></li>
-                    <li><a class="nav-link {{ Route::is('portal.secciones.index') ? 'active' : '' }}" href="{{ route('portal.secciones.index') }}">Gestión de Horarios</a></li>
-                    <li><a class="nav-link {{ Route::is('portal.docentes.index') ? 'active' : '' }}" href="{{ route('portal.docentes.index') }}">Docentes</a></li>
-                    <li><a class="nav-link {{ Route::is('portal.alumnos.index') ? 'active' : '' }}" href="{{ route('portal.alumnos.index') }}">Alumnos</a></li>
-                    <li><a class="nav-link {{ Route::is('portal.matriculas.index') ? 'active' : '' }}" href="{{ route('portal.matriculas.index') }}">Matriculas</a></li>
-                    <li><a class="nav-link {{ Route::is('portal.users.index') ? 'active' : '' }}" href="{{ route('portal.users.index') }}">Usuarios del Sistema</a></li>
+                    <li><a class="nav-link {{ Route::is('portal.periodos.index') ? 'active' : '' }}"
+                            href="{{ route('portal.periodos.index') }}">Gestión de Periodos</a></li>
+                    <li><a class="nav-link {{ Route::is('portal.cursos.index') ? 'active' : '' }}"
+                            href="{{ route('portal.cursos.index') }}">Gestión de Cursos</a></li>
+                    <li><a class="nav-link {{ Route::is('portal.categorias.index') ? 'active' : '' }}"
+                            href="{{ route('portal.categorias.index') }}">Gestión de Categorías</a></li>
+                    <li><a class="nav-link {{ Route::is('portal.secciones.index') ? 'active' : '' }}"
+                            href="{{ route('portal.secciones.index') }}">Gestión de Horarios</a></li>
+                    <li><a class="nav-link {{ Route::is('portal.docentes.index') ? 'active' : '' }}"
+                            href="{{ route('portal.docentes.index') }}">Docentes</a></li>
+                    <li><a class="nav-link {{ Route::is('portal.alumnos.index') ? 'active' : '' }}"
+                            href="{{ route('portal.alumnos.index') }}">Alumnos</a></li>
+                    <li><a class="nav-link {{ Route::is('portal.matriculas.index') ? 'active' : '' }}"
+                            href="{{ route('portal.matriculas.index') }}">Matriculas</a></li>
+                    <li><a class="nav-link {{ Route::is('portal.users.index') ? 'active' : '' }}"
+                            href="{{ route('portal.users.index') }}">Usuarios del Sistema</a></li>
                 @endactiveRole
 
                 @activeRole('encargado_sede')
-                    <li><a href="{{ route('portal.asistencias.index') }}" class="{{ Route::is('portal.asistencias.index') ? 'active' : '' }}">Asistencia diaria</a></li>
-                    <li><a href="{{ route('portal.asistencias.reporte') }}" class="{{ Route::is('portal.asistencias.reporte') ? 'active' : '' }}">Reporte General</a></li>
-                    <li><a href="{{ route('portal.asistencias.reporteMensual') }}" class="{{ Route::is('portal.asistencias.reporteMensual') ? 'active' : '' }}">Reporte de Asistencia</a></li>
-                    <li><a href="{{ route('portal.perfil.index') }}" class="{{ Route::is('portal.perfil.index') ? 'active' : '' }}">Mi Perfil</a></li>
+                    <li><a href="{{ route('portal.asistencias.index') }}"
+                            class="{{ Route::is('portal.asistencias.index') ? 'active' : '' }}">Asistencia diaria</a></li>
+                    <li><a href="{{ route('portal.asistencias.reporte') }}"
+                            class="{{ Route::is('portal.asistencias.reporte') ? 'active' : '' }}">Reporte General</a></li>
+                    <li><a href="{{ route('portal.asistencias.reporteMensual') }}"
+                            class="{{ Route::is('portal.asistencias.reporteMensual') ? 'active' : '' }}">Reporte de
+                            Asistencia</a></li>
+                    <li><a href="{{ route('portal.perfil.index') }}"
+                            class="{{ Route::is('portal.perfil.index') ? 'active' : '' }}">Mi Perfil</a></li>
                 @endactiveRole
 
                 @activeRole('docente')
-                    <li><a href="{{ route('portal.misCursos') }}" class="{{ Route::is('portal.misCursos') ? 'active' : '' }}">Mis Cursos (Docente)</a></li>
+                    <li><a href="{{ route('portal.misCursos') }}"
+                            class="{{ Route::is('portal.misCursos') ? 'active' : '' }}">Mis Cursos (Docente)</a></li>
                 @endactiveRole
 
-                <li>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" style="width: 100%; text-align: left; background: none; border: none; padding: 10px 20px; color: white; cursor: pointer;">Cerrar sesión</button>
-                    </form>
+                @activeRole('alumno')
+                    <li><a href="{{ route('portal.horarios.index') }}"
+                            class="{{ Route::is('portal.horarios.index') ? 'active' : '' }}">Horario</a></li>
+                @endactiveRole
+
+
+                @activeRole('admin|docente|encargado_sede|alumno')
+                    <li><a href="{{ route('portal.perfil.index') }}"
+                            class="{{ Route::is('portal.perfil.index') ? 'active' : '' }}">Mi Perfil</a></li>
+                @endactiveRole
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit"
+                        style="width: 100%; text-align: left; background: none; border: none; padding: 10px 20px; color: white; cursor: pointer;">Cerrar
+                        sesión</button>
+                </form>
                 </li>
             </ul>
         </aside>
@@ -87,7 +118,9 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.dispatch(metodo, { id: id });
+                    Livewire.dispatch(metodo, {
+                        id: id
+                    });
                 }
             });
         }
@@ -101,10 +134,13 @@
                     title: data.title || 'Mensaje',
                     text: data.text || '',
                     confirmButtonColor: '#4f46e5',
-                    customClass: { popup: 'rounded-3xl' }
+                    customClass: {
+                        popup: 'rounded-3xl'
+                    }
                 });
             });
         });
     </script>
 </body>
+
 </html>

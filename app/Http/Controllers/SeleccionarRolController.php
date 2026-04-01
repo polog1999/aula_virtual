@@ -43,6 +43,7 @@ class SeleccionarRolController extends Controller
             'admin' => redirect()->route('portal.periodos.index'),
             'encargado_sede' => redirect()->route('portal.asistencias.index'),
             'docente' => redirect()->route('portal.misCursos'),
+            'alumno' => redirect()->route('portal.horarios.index'),
             default => redirect('/portal'),
         };
     }

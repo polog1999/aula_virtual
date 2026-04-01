@@ -22,4 +22,8 @@ class Sesion extends Model
     public function modulo(){
         return $this->belongsTo(Modulo::class,'modulo_id');
     }
+    public function recursos()
+{
+    return $this->hasMany(SesionRecurso::class, 'sesion_id');
+}
 }

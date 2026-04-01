@@ -41,6 +41,7 @@ use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SeleccionarRol;
 use App\Http\Controllers\SeleccionarRolController;
 use App\Http\Controllers\SesionController;
+use App\Livewire\Alumno\MiAula;
 use App\Livewire\AlumnoManager;
 use App\Livewire\Asistencia\AsistenciaManager;
 use App\Livewire\Asistencia\CentralReportes;
@@ -142,7 +143,7 @@ Route::middleware('auth', 'role:admin')->prefix('portal')->group(function () {
     Route::get('reportes/alumnos-pagos', [AdminPagoController::class, 'exportarPagos'])
         ->name('portal.reportes.pagos');
 });
-Route::middleware('auth', 'role:admin|encargado_sede')->prefix('portal')->group(function () {
+Route::middleware('auth', 'role:encargado_sede')->prefix('portal')->group(function () {
     Route::get('/asistencias', AsistenciaManager::class)->name('portal.asistencias.index');
     // Route::put('/edit', [AsistenciaController::class, 'update'])->name('portal.asistencias.update');
     Route::get('/asistencias/reporte-mensual', ReporteMensual::class)->name('portal.asistencias.reporteMensual');
@@ -160,7 +161,7 @@ Route::middleware('auth', 'role:admin|encargado_sede')->prefix('portal')->group(
 
     Route::get('reportes/asistencias-periodo', [ReporteAsistenciaController::class, 'exportarAsistencias'])
         ->name('portal.reportes.asistencias');
-    Route::get('perfil', MiPerfil::class)->name('portal.perfil.index');
+    
 
     Route::get(
         '/',
@@ -172,6 +173,9 @@ Route::middleware('auth', 'role:admin|encargado_sede')->prefix('portal')->group(
 
             if ($user->hasRole('encargado_sede')) {
                 return redirect()->route('portal.asistencias.index');
+            }
+            if ($user->hasRole('alumno')) {
+                return redirect()->route('portal.horarios.index');
             }
 
             // if ($user->hasRole('docente')) {
@@ -185,10 +189,15 @@ Route::middleware('auth', 'role:admin|encargado_sede')->prefix('portal')->group(
 
     // Route::get('perfil', [PerfilController::class, 'index'])->name('portal.perfil.index');
 });
-Route::middleware('auth', 'role:admin|docente|encargado_sede')->prefix('portal')->group(function () {
+Route::middleware('auth', 'role:docente')->prefix('portal')->group(function () {
     Route::get('/mis-cursos', MisCursos::class)->name('portal.misCursos');
 });
-
+Route::middleware('auth', 'role:alumno')->prefix('portal')->group(function () {
+    Route::get('/horarios', MiAula::class)->name('portal.horarios.index');
+});
+Route::middleware('auth', 'role:docente|admin|alumno|encargado_sede')->prefix('portal')->group(function () {
+    Route::get('perfil', MiPerfil::class)->name('portal.perfil.index');
+});
 Route::middleware('auth', 'role:docente')->prefix('docente')->group(function () {
     Route::get('/talleres', [MisCursosController::class, 'index'])->name('docente.talleres');
     Route::get('perfil', [PerfilController::class, 'index'])->name('docente.perfil.index');
@@ -198,8 +207,8 @@ Route::middleware('auth', 'role:docente')->prefix('docente')->group(function () 
     Route::get('/horarios', [DocenteHorarioController::class, 'index'])->name('docente.horarios.index');
     // Route::put('perfil', [PerfilController::class, 'updatePassword'])->name('docente.perfil.updatePassword');
 });
-Route::middleware('auth', 'role:ALUMNO')->prefix('alumno')->group(function () {
-    Route::get('/', [HorarioController::class, 'index'])->name('alumno.horarios.index');
+Route::middleware('auth', 'role:alumno')->prefix('alumFno')->group(function () {
+    // Route::get('/horarios', [HorarioController::class, 'index'])->name('alumno.horarios.index');
     Route::get('/pagos', [PagoController::class, 'index'])->name('alumno.pagos.index');
     Route::get('/asistencias', [AlumnoAsistenciaController::class, 'index'])->name('alumno.asistencias.index');
     Route::get('perfil', [PerfilController::class, 'index'])->name('alumno.perfil.index');

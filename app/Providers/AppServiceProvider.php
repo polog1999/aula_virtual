@@ -25,9 +25,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-    Blade::if('activeRole', function ($role) {
+     Blade::if('activeRole', function ($roles) {
         // Verifica si el rol en la sesión coincide con el que pedimos
-        return session('active_role') === $role;
+        $activeRole = session('active_role');
+        // 2. Convertimos el string 'ADMIN|DOCENTE' en un array ['ADMIN', 'DOCENTE']
+        $allowedRoles = explode('|', $roles);
+
+        // 3. Verificamos si el rol actual está en la lista permitida
+        return in_array($activeRole, $allowedRoles);
     });
         //
         Paginator::useBootstrapFive();

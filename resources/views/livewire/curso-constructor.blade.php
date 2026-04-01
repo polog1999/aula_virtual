@@ -6,7 +6,7 @@
                 <h1 class="text-3xl font-black text-gray-800 tracking-tight uppercase">Constructor de Cursos</h1>
                 <p class="text-gray-500 font-medium italic uppercase text-xs">Define el molde estructural de tu aula virtual</p>
             </div>
-            <button wire:click="openCourseModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl shadow-lg shadow-indigo-200 transition-all font-bold flex items-center justify-center gap-2">
+            <button wire:click="openCourseModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl shadow-lg shadow-indigo-200 transition-all font-bold flex items-center justify-center gap-2 text-xs">
                 <i class="fa-solid fa-plus"></i> CREAR NUEVO CURSO
             </button>
         </div>
@@ -100,7 +100,7 @@
                                     </div>
                                 </div>
                                 @empty
-                                <div class="p-4 text-center text-[9px] text-gray-400 font-black uppercase tracking-widest italic italic">Unidad sin sesiones definidas</div>
+                                <div class="p-4 text-center text-[9px] text-gray-400 font-black uppercase tracking-widest italic">Unidad sin sesiones definidas</div>
                                 @endforelse
                             </div>
                         </div>
@@ -124,7 +124,47 @@
         </div>
     </div>
 
-    <!-- MODAL SESIÓN (SIMPLIFICADO - MOLDE) -->
+    <!-- MODAL UNIDAD (SIMPLIFICADO Y AUTOMÁTICO) -->
+    @if ($isModuleModalOpen)
+    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-200">
+            <div class="px-8 py-6 bg-indigo-600 text-white flex justify-between items-center">
+                <h2 class="text-lg font-black uppercase tracking-widest italic">{{ $modulo_id ? 'Editar Fecha Unidad' : 'Nueva Unidad Automática' }}</h2>
+                <button wire:click="$set('isModuleModalOpen', false)" class="text-indigo-200 hover:text-white text-3xl">&times;</button>
+            </div>
+            <form wire:submit.prevent="saveModulo" class="p-8 space-y-6">
+                
+                <div class="text-center bg-indigo-50 p-4 rounded-2xl border border-indigo-100">
+                    <p class="text-xs font-black text-indigo-700 uppercase tracking-widest">{{ $mod_nombre }}</p>
+                    <p class="text-[10px] text-indigo-400 font-bold uppercase mt-1">El nombre y orden se gestionan automáticamente</p>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 ml-1 tracking-widest">Disponible desde</label>
+                    <input type="date" wire:model="mod_disponible" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold text-gray-700">
+                    @error('mod_disponible') <span class="text-red-500 text-[10px] font-bold block mt-1 uppercase">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 ml-1 tracking-widest">Estado de la Unidad</label>
+                    <select wire:model="mod_activo" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold">
+                        <option value="1">Activa</option>
+                        <option value="0">Inactiva</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="button" wire:click="$set('isModuleModalOpen', false)" class="flex-1 py-4 font-black text-gray-400 uppercase text-xs hover:text-gray-600 transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-100 transition-all active:scale-95 uppercase">
+                        {{ $modulo_id ? 'Actualizar Unidad' : 'Generar Unidad' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
+
+    <!-- MODAL SESIÓN (SIMPLIFICADO) -->
     @if ($isSessionModalOpen)
     <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-200">
@@ -142,97 +182,90 @@
                 <div>
                     <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 ml-1 tracking-widest">Visibilidad Inicial</label>
                     <select wire:model="ses_activo" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold">
-                        <option value="1">VISIBLE (Publicado)</option>
-                        <option value="0">OCULTO (Borrador)</option>
+                        <option value="1">VISIBLE</option>
+                        <option value="0">OCULTO</option>
                     </select>
-                </div>
-
-                <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100">
-                    <p class="text-[10px] text-amber-700 font-black uppercase leading-tight italic">
-                        <i class="fa-solid fa-circle-info mr-1"></i> Nota: El contenido (Videos, Exámenes y Recursos) será gestionado por el docente asignado una vez activada la sección.
-                    </p>
                 </div>
 
                 <div class="flex gap-4 pt-4">
                     <button type="button" wire:click="$set('isSessionModalOpen', false)" class="flex-1 py-4 font-black text-gray-400 uppercase text-xs hover:text-gray-600 transition-colors">Cancelar</button>
-                    <button type="submit" class="flex-1 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 transition-all active:scale-95">Guardar Molde</button>
+                    <button type="submit" class="flex-1 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-xl shadow-indigo-100 transition-all active:scale-95 uppercase">Guardar Sesión</button>
                 </div>
             </form>
         </div>
     </div>
     @endif
 
-    {{-- (Los modales de Curso y Módulo permanecen iguales a tu código original pero con los estilos actualizados de Tailwind) --}}
     <!-- MODAL CURSO -->
-    @if ($isCourseModalOpen)
-    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-200">
-            <div class="p-8 pb-0 flex justify-between items-center">
-                <h2 class="text-xl font-black text-gray-800 uppercase italic tracking-tighter">{{ $curso_id ? 'Editar Curso' : 'Nuevo Curso' }}</h2>
-                <button wire:click="$set('isCourseModalOpen', false)" class="text-gray-400 hover:text-gray-800 text-3xl">&times;</button>
-            </div>
-            <form wire:submit.prevent="saveCurso" class="p-8 space-y-5">
-                <div>
-                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Nombre</label>
-                    <input type="text" wire:model="nombre" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold uppercase text-gray-700">
-                    @error('nombre') <span class="text-red-500 text-[10px] font-bold">{{ $message }}</span> @enderror
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Categoría</label>
-                        <select wire:model="categoria_id" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold">
-                            <option value="">Seleccionar...</option>
-                            @foreach ($categorias as $cat) <option value="{{ $cat->id }}">{{ $cat->nombre }}</option> @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Estado</label>
-                        <select wire:model="activo" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold">
-                            <option value="1">Activo</option>
-                            <option value="0">Inactivo</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Descripción</label>
-                    <textarea wire:model="descripcion" rows="3" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold"></textarea>
-                </div>
-                <button type="submit" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">Guardar Curso</button>
-            </form>
+   <!-- Solo incluyo el Modal de Curso actualizado para no repetir todo el código -->
+@if ($isCourseModalOpen)
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+        <div class="p-8 pb-0 flex justify-between items-center">
+            <h2 class="text-xl font-black text-gray-800 uppercase italic tracking-tighter">{{ $curso_id ? 'Editar Curso' : 'Nuevo Curso' }}</h2>
+            <button wire:click="$set('isCourseModalOpen', false)" class="text-gray-400 hover:text-gray-800 text-3xl">&times;</button>
         </div>
-    </div>
-    @endif
+        <form wire:submit.prevent="saveCurso" class="p-8 space-y-4">
+            
+            <!-- Preview de Imagen -->
+            <div class="flex justify-center mb-4">
+                <div class="relative group">
+                    <div class="w-32 h-32 rounded-3xl overflow-hidden bg-gray-100 border-4 border-white shadow-lg flex items-center justify-center">
+                        @if ($imagen)
+                            <img src="{{ $imagen->temporaryUrl() }}" class="w-full h-full object-cover">
+                        @elseif ($imagen_actual)
+                            <img src="{{ asset('storage/' . $imagen_actual) }}" class="w-full h-full object-cover">
+                        @else
+                            <i class="fa-solid fa-image text-4xl text-gray-300"></i>
+                        @endif
+                        
+                        <!-- Spinner de carga -->
+                        <div wire:loading wire:target="imagen" class="absolute inset-0 bg-white/80 flex items-center justify-center">
+                            <i class="fa-solid fa-spinner fa-spin text-indigo-600"></i>
+                        </div>
+                    </div>
+                    <label class="absolute -bottom-2 -right-2 bg-indigo-600 text-white p-2 rounded-xl shadow-lg cursor-pointer hover:bg-indigo-700 transition-colors">
+                        <i class="fa-solid fa-camera"></i>
+                        <input type="file" wire:model="imagen" class="hidden" accept="image/*">
+                    </label>
+                </div>
+            </div>
 
-    <!-- MODAL UNIDAD -->
-    @if ($isModuleModalOpen)
-    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in duration-200">
-            <div class="p-8 pb-0 flex justify-between items-center">
-                <h2 class="text-xl font-black text-gray-800 uppercase italic tracking-tighter">{{ $modulo_id ? 'Editar Unidad' : 'Añadir Unidad' }}</h2>
-                <button wire:click="$set('isModuleModalOpen', false)" class="text-gray-400 hover:text-gray-800 text-3xl">&times;</button>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Nombre del Curso</label>
+                <input type="text" wire:model="nombre" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold uppercase text-gray-700">
+                @error('nombre') <span class="text-red-500 text-[10px] font-bold">{{ $message }}</span> @enderror
             </div>
-            <form wire:submit.prevent="saveModulo" class="p-8 space-y-4">
-                <div class="grid grid-cols-4 gap-4">
-                    <div class="col-span-3">
-                        <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Nombre de la Unidad</label>
-                        <input type="text" wire:model="mod_nombre" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold uppercase text-gray-700">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Orden</label>
-                        <input type="number" wire:model="mod_orden" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold">
-                    </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Categoría</label>
+                    <select wire:model="categoria_id" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold">
+                        <option value="">Seleccionar...</option>
+                        @foreach ($categorias as $cat) <option value="{{ $cat->id }}">{{ $cat->nombre }}</option> @endforeach
+                    </select>
+                    @error('categoria_id') <span class="text-red-500 text-[10px] font-bold">{{ $message }}</span> @enderror
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Disponible desde</label>
-                    <input type="date" wire:model="mod_disponible" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold">
+                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Estado</label>
+                    <select wire:model="activo" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold">
+                        <option value="1">Activo</option>
+                        <option value="0">Inactivo</option>
+                    </select>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Descripción</label>
-                    <textarea wire:model="mod_descripcion" rows="2" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold"></textarea>
-                </div>
-                <button type="submit" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">Guardar Unidad</button>
-            </form>
-        </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1 ml-1">Descripción</label>
+                <textarea wire:model="descripcion" rows="3" class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-4 focus:ring-indigo-100 font-bold text-gray-600"></textarea>
+            </div>
+
+            <button type="submit" wire:loading.attr="disabled" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+                <span wire:loading.remove wire:target="saveCurso">Guardar Curso</span>
+                <span wire:loading wire:target="saveCurso">Procesando...</span>
+            </button>
+        </form>
     </div>
-    @endif
+</div>
+@endif
 </div>

@@ -28,6 +28,7 @@ class RedirectIfAuthenticatedCustom
             // if ($user->hasRole('alumno')) return redirect('/alumno');
             if ($user->hasRole('encargado_sede')) return redirect()->route('portal.asistencias.index');
             if ($user->hasRole('docente')) return redirect()->route('portal.misCursos');
+            if ($user->hasRole('alumno')) return redirect()->route('portal.misCursos');
         }
 
         return $next($request);

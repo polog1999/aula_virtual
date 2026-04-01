@@ -12,6 +12,7 @@ return new class extends Migration
             
             // Datos del Participante (del formulario)
             $blueprint->string('nombres');
+            $blueprint->string('apellidos');
             $blueprint->string('dni', 8);
             $blueprint->string('colegiatura');
             $blueprint->string('email');

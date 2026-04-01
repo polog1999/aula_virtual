@@ -5,76 +5,95 @@ namespace App\Livewire\Docente;
 use Livewire\Component;
 use App\Models\Seccion;
 use App\Models\Sesion;
-use App\Models\Matricula;
+use App\Models\SesionRecurso;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 
 class MisCursos extends Component
 {
     use WithFileUploads;
 
-    // Propiedades de navegación
     public $secciones;
     public $seccionSeleccionadaId;
-    public $search = '';
-
-    // Modales
     public $isAlumnosModalOpen = false;
     public $isEditSesionModalOpen = false;
 
-    // Datos del Modal
-    public $alumnos = [];
-    public $nombreSeccionModal = '';
-    
-    // Formulario de Sesión (Contenido del Docente)
+    // Datos Sesión
     public $sesionId;
-    public $ses_titulo, $ses_descripcion, $ses_evaluacion, $ses_activo, $ses_link;
+    public $ses_titulo, $ses_descripcion, $ses_evaluacion, $ses_activo;
+    
+    // Gestión de Recursos Nuevos
+    public $tipo_recurso_nuevo = 'ARCHIVO'; // ARCHIVO o LINK
+    public $nombre_recurso_nuevo;
+    public $archivo_nuevo;
+    public $link_nuevo;
+    
+    public $recursos_existentes = [];
 
-    public function mount()
-    {
-        $this->loadSecciones();
+    public function mount() { $this->loadSecciones(); }
+
+    public function loadSecciones() {
+        $this->secciones = Seccion::where('docente_id', Auth::id())
+            ->with(['curso.categoria', 'periodo'])
+            ->withCount('matriculas')->get();
     }
 
-    public function loadSecciones()
-    {
-        // Traemos las secciones asignadas al docente logueado
-        $docenteId = Auth::user()->id;
-        $this->secciones = Seccion::where('docente_id', $docenteId)
-            ->with(['curso.categoria', 'periodo', 'matriculas.alumnos.user'])
-            ->withCount('matriculas')
-            ->get();
-    }
-
-    public function selectSeccion($id)
-    {
+    public function selectSeccion($id) {
         $this->seccionSeleccionadaId = ($this->seccionSeleccionadaId == $id) ? null : $id;
     }
 
-    // --- LÓGICA DE ALUMNOS ---
-    public function openAlumnosModal($seccionId)
-    {
-        $seccion = Seccion::with('matriculas.alumnos.user', 'matriculas.alumnos.padre.user')->find($seccionId);
-        $this->nombreSeccionModal = $seccion->nombre;
-        $this->alumnos = $seccion->matriculas;
-        $this->isAlumnosModalOpen = true;
-    }
-
-    // --- LÓGICA DE GESTIÓN DE CONTENIDO (SESIONES) ---
-    public function editSesion($sesionId)
-    {
-        $sesion = Sesion::findOrFail($sesionId);
+    public function editSesion($sesionId) {
+        $sesion = Sesion::with('recursos')->findOrFail($sesionId);
         $this->sesionId = $sesionId;
         $this->ses_titulo = $sesion->titulo;
         $this->ses_descripcion = $sesion->descripcion;
         $this->ses_evaluacion = $sesion->es_evaluacion;
         $this->ses_activo = $sesion->activo;
-        // Asumiendo que el link se guarda en la descripción o tienes un campo link_reunion
-        // Si no existe el campo, usaremos la descripción para este ejemplo
+        
+        $this->recursos_existentes = $sesion->recursos;
+        $this->reset(['nombre_recurso_nuevo', 'archivo_nuevo', 'link_nuevo']);
         $this->isEditSesionModalOpen = true;
     }
 
-    public function saveSesion()
-    {
+    // Agregar recurso inmediatamente a la sesión
+    public function addRecurso() {
+        $this->validate([
+            'nombre_recurso_nuevo' => 'required|string|max:100',
+            'tipo_recurso_nuevo' => 'required|in:ARCHIVO,LINK',
+            'archivo_nuevo' => 'required_if:tipo_recurso_nuevo,ARCHIVO|max:10240', // 10MB
+            'link_nuevo' => 'required_if:tipo_recurso_nuevo,LINK|nullable|url',
+        ]);
+
+        if ($this->tipo_recurso_nuevo === 'ARCHIVO') {
+            $path = $this->archivo_nuevo->store('recursos_clases', 'public');
+            $url = $path;
+        } else {
+            $url = $this->link_nuevo;
+        }
+
+        SesionRecurso::create([
+            'sesion_id' => $this->sesionId,
+            'nombre' => mb_strtoupper($this->nombre_recurso_nuevo),
+            'url_path' => $url,
+            'tipo' => $this->tipo_recurso_nuevo
+        ]);
+
+        $this->reset(['nombre_recurso_nuevo', 'archivo_nuevo', 'link_nuevo']);
+        $this->recursos_existentes = SesionRecurso::where('sesion_id', $this->sesionId)->get();
+        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Recurso Agregado']);
+    }
+
+    public function deleteRecurso($recursoId) {
+        $recurso = SesionRecurso::find($recursoId);
+        if ($recurso->tipo === 'ARCHIVO') {
+            Storage::disk('public')->delete($recurso->url_path);
+        }
+        $recurso->delete();
+        $this->recursos_existentes = SesionRecurso::where('sesion_id', $this->sesionId)->get();
+    }
+
+    public function saveSesion() {
         $this->validate([
             'ses_titulo' => 'required',
             'ses_descripcion' => 'required',
@@ -89,16 +108,13 @@ class MisCursos extends Component
         ]);
 
         $this->isEditSesionModalOpen = false;
-        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Contenido Actualizado', 'text' => 'La sesión ha sido publicada con el nuevo material.']);
+        $this->dispatch('swal', ['icon' => 'success', 'title' => 'Sesión Actualizada']);
     }
 
-    public function getSeccionActivaProperty()
-    {
-        return Seccion::with(['curso.modulos.sesiones', 'periodo'])->find($this->seccionSeleccionadaId);
+    public function getSeccionActivaProperty() {
+        if (!$this->seccionSeleccionadaId) return null;
+        return Seccion::with(['curso.modulos.sesiones.recursos', 'periodo'])->find($this->seccionSeleccionadaId);
     }
 
-    public function render()
-    {
-        return view('livewire.docente.mis-cursos');
-    }
+    public function render() { return view('livewire.docente.mis-cursos'); }
 }

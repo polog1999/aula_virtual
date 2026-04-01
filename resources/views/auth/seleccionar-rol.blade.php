@@ -141,12 +141,12 @@
                             @case('docente')    
                                 <i class="fa-solid fa-chalkboard-user"></i>
                                 @break
-                            @case('ALUMNO')
+                            @case('alumno')
                                 <i class="fa-solid fa-user-graduate"></i>
                                 @break
-                            @case('PADRE')
+                            {{-- @case('PADRE')
                                 <i class="fa-solid fa-users"></i>
-                                @break
+                                @break --}}
                             @case('encargado_sede')
                                 <i class="fa-solid fa-clipboard-user"></i>
                                 @break
