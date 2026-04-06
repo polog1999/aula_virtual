@@ -133,6 +133,7 @@ class FormularioInscripcion extends Component
             'role' => 'ALUMNO',
             'tipo_documento' => 'DNI'
         ]);
+        $alumno->assignRole('alumno');
 
         $alumno->alumno()->firstOrCreate([]);
 

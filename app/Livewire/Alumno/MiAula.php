@@ -5,6 +5,7 @@ namespace App\Livewire\Alumno;
 use Livewire\Component;
 use App\Models\Matricula;
 use App\Models\Sesion;
+use App\Models\Calificacion;
 use Illuminate\Support\Facades\Auth;
 
 class MiAula extends Component
@@ -13,9 +14,10 @@ class MiAula extends Component
     public $selectedMatriculaId; 
     public $openModules = [];    
     
-    // Propiedades para el Modal de Recurso
+    // Propiedades para el Modal
     public $isResourceModalOpen = false;
     public $sesionSeleccionada;
+    public $notaSesion = null;
 
     public function mount()
     {
@@ -40,17 +42,23 @@ class MiAula extends Component
         }
     }
 
-    // --- NUEVO: Lógica para abrir modal de recursos ---
     public function openResourceModal($sesionId)
     {
         $this->sesionSeleccionada = Sesion::with('recursos')->find($sesionId);
+        
+        // Buscar la nota específica para esta sesión y esta matrícula
+        $calificacion = Calificacion::where('sesion_id', $sesionId)
+            ->where('matricula_id', $this->selectedMatriculaId)
+            ->first();
+            
+        $this->notaSesion = $calificacion ? $calificacion->nota : null;
         $this->isResourceModalOpen = true;
     }
 
     public function closeResourceModal()
     {
         $this->isResourceModalOpen = false;
-        $this->reset('sesionSeleccionada');
+        $this->reset(['sesionSeleccionada', 'notaSesion']);
     }
 
     public function getMatriculasProperty()
@@ -66,11 +74,12 @@ class MiAula extends Component
     public function getMatriculaSeleccionadaProperty()
     {
         if (!$this->selectedMatriculaId) return null;
+
+        // Cargamos la matrícula con sus notas para cruzarlas en la vista
         return Matricula::with([
-            'seccion.curso.modulos' => function($q) {
-                $q->orderBy('orden', 'asc')->with('sesiones.recursos');
-            },
-            'seccion.docentes.user'
+            'seccion.curso.modulos.sesiones.recursos',
+            'seccion.docentes.user',
+            'calificaciones' // Importante para ver las notas en la lista
         ])->find($this->selectedMatriculaId);
     }
 

@@ -6,8 +6,7 @@
                 <!-- Logo -->
                 <a href="/" class="flex items-center gap-3">
                     <div class="flex flex-col">
-                        <span class="text-[#3a348b] font-black text-xl leading-none uppercase tracking-tighter">INSN</span>
-                        <span class="text-[#9d2581] text-[10px] font-bold uppercase">Líder en Pediatría</span>
+                        <img src="{{asset('storage/logo/LOGO-INSN-2022.png')}}" alt="Logo INSN" style="width:120px" >
                     </div>
                 </a>
 

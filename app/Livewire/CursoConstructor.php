@@ -75,7 +75,7 @@ class CursoConstructor extends Component
     public function saveCurso()
     {
         $this->validate([
-            'nombre' => 'required|max:200|unique:cursos,nombre,' . $this->curso_id,
+            'nombre' => 'required|max:200|unique:cursos,nombre',
             'descripcion' => 'required',
             'categoria_id' => 'required|exists:categorias,id',
             'imagen' => 'nullable|image|max:2048', // Max 2MB

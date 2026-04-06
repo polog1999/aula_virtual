@@ -173,7 +173,7 @@
 
     <div class="login-container">
         <div class="login-header">
-            <img src=""
+            <img src="{{asset('storage/logo/LOGO-INSN-2022.png')}}"
                 alt="Logo">
             <h1>Aula virual</h1>
             <p>Bienvenido, por favor inicie sesión.</p>
