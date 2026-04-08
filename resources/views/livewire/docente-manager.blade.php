@@ -101,15 +101,15 @@
                         @error('editNombre') <span class="text-red-500 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                     <div class="md:col-span-1">
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Apellido Paterno</label>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Apellidos</label>
                         <input type="text" wire:model="editApPaterno" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-semibold uppercase">
                         @error('editApPaterno') <span class="text-red-500 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
-                    <div class="md:col-span-1">
+                    {{-- <div class="md:col-span-1">
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Apellido Materno</label>
                         <input type="text" wire:model="editApMaterno" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-semibold uppercase">
                         @error('editApMaterno') <span class="text-red-500 text-[10px] font-bold">{{ $message }}</span> @enderror
-                    </div>
+                    </div> --}}
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">

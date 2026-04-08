@@ -51,7 +51,7 @@ class DocenteManager extends Component
         $this->validate([
             'editNombre' => 'required|string|max:100',
             'editApPaterno' => 'required|string|max:100',
-            'editApMaterno' => 'required|string|max:100',
+            // 'editApMaterno' => 'required|string|max:100',
             'editTipo' => 'required|in:DNI,CE',
             'editDocumento' => 'required|string|max:12|unique:users,numero_documento,' . $this->docenteId,
         ], [
@@ -95,7 +95,7 @@ class DocenteManager extends Component
 
     public function render()
     {
-        $query = User::query()->where('es_docente', true);
+        $query = User::role('docente');
 
         if ($this->search) {
             $s = $this->search;

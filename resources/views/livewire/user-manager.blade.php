@@ -107,13 +107,13 @@
                         @error('nombres') <span class="text-red-500 text-[10px] font-bold">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-1 ml-1">Ap. Paterno</label>
+                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-1 ml-1">Apellidos</label>
                         <input type="text" wire:model="apellido_paterno" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold uppercase">
                     </div>
-                    <div>
+                    {{-- <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase mb-1 ml-1">Ap. Materno</label>
                         <input type="text" wire:model="apellido_materno" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold uppercase">
-                    </div>
+                    </div> --}}
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\On;
 
 class UserManager extends Component
@@ -66,8 +67,18 @@ class UserManager extends Component
         $this->validate([
             'nombres' => 'required|string|max:100',
             'tipo_documento' => 'required|in:DNI,CE',
-            'numero_documento' => 'required|string|max:12|unique:users,numero_documento,' . $this->userId,
-            'email' => 'required|email|max:320|unique:users,email,' . $this->userId,
+            'numero_documento' => [
+                'required', 
+                'string', 
+                'max:12', 
+                Rule::unique('users', 'numero_documento')->ignore($this->userId)
+            ],
+            'email' => [
+                'required', 
+                'email', 
+                'max:320', 
+                Rule::unique('users', 'email')->ignore($this->userId)
+            ],
             'roles_seleccionados' => 'required|array|min:1',
         ], [
             'numero_documento.unique' => 'El número de documento ya está registrado.',
